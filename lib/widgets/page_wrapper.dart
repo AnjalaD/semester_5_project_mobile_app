@@ -10,12 +10,12 @@ class PageWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<Authentication>(
-      builder: (_, auth, __) => LoaderOverlay(
-        child: child,
-        useDefaultLoading: auth != null ? auth.isLoading : false,
-        overlayWidget: CircularProgressIndicator(),
-        overlayColor: Colors.black,
-      ),
+      // builder: (_, auth, __) => LoaderOverlay(
+      child: child,
+      // useDefaultLoading: auth != null ? auth.isLoading : false,
+      // overlayWidget: CircularProgressIndicator(),
+      // overlayColor: Colors.black,
+      // ),
     );
   }
 }

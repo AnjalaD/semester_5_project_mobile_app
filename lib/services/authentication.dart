@@ -3,11 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'package:semester_5_project_mobile_app/constants/api.dart';
 import 'package:semester_5_project_mobile_app/models/proxy_user_model.dart';
 import 'package:semester_5_project_mobile_app/models/user_model.dart';
+import 'package:semester_5_project_mobile_app/services/fcm.dart';
 import 'package:semester_5_project_mobile_app/util/app_storage.dart';
 
 class Authentication extends ChangeNotifier {
   final Dio _dio = new Dio();
-  final AppStorage storage = AppStorage();
+  final AppStorage _storage = AppStorage();
 
   bool _isLoading = false;
   ProxyUser _proxyUser;
@@ -22,19 +23,34 @@ class Authentication extends ChangeNotifier {
   }
 
   Future<void> _signInFromLocalData() async {
-    _isLoading = true;
-    notifyListeners();
-    _proxyUser = await storage.getSignInData();
-    if (_proxyUser != null) {
-      print('user from storage' + _proxyUser.toJson().toString());
-      try {
-        await _getUser();
-      } catch (err) {
-        print(err.toString());
-      }
-    }
-    _isLoading = false;
-    notifyListeners();
+    // _isLoading = true;
+    // notifyListeners();
+    // _proxyUser = await _storage.getSignInData();
+    // if (_proxyUser != null) {
+    //   print('user from storage' + _proxyUser.toJson().toString());
+    //   try {
+    //     if (await _getUser()) {
+    //       new Fcm();
+    //     }
+    //   } catch (err) {
+    //     print(err.toString());
+    //   }
+    // }
+    // _isLoading = false;
+    // notifyListeners();
+
+    _proxyUser = new ProxyUser(id: '1234', token: '1242');
+    _user = new User(
+        firstName: 'Anjala',
+        lastName: 'Dilhara',
+        addressLine1: '123/a',
+        addressLine2: '',
+        city: 'Ranala',
+        dob: '2013-12-12',
+        email: 'anja@i.com',
+        nic: '918123123',
+        telephoneNumber: '1212414124');
+    new Fcm();
   }
 
   ///signIn to system
@@ -63,7 +79,7 @@ class Authentication extends ChangeNotifier {
       // print(_proxyUser.toJson());
       if (keepSignedIn) {
         print('storing user data : ' + _proxyUser.toJson().toString());
-        storage.storeSignInData(_proxyUser);
+        _storage.storeSignInData(_proxyUser);
       }
       await _getUser();
     } catch (err) {
@@ -108,7 +124,7 @@ class Authentication extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await storage.clearStorage();
+      await _storage.clearStorage();
     } catch (err) {
       print(err.toString());
     }
