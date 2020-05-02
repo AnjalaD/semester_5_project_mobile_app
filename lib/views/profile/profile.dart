@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
 import 'package:semester_5_project_mobile_app/views/profile/change_location.dart';
+import 'package:semester_5_project_mobile_app/views/profile/widgets/profile_row.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_button.dart';
 import 'package:semester_5_project_mobile_app/widgets/drawer.dart';
 import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
@@ -68,45 +69,6 @@ class Profile extends StatelessWidget {
             )
           ],
         ),
-      ),
-    );
-  }
-}
-
-class ProfileRow extends StatelessWidget {
-  const ProfileRow({
-    Key key,
-    this.name,
-    this.value,
-  }) : super(key: key);
-
-  final String name;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      padding: EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).primaryColor.withOpacity(0.5),
-          ),
-        ),
-      ),
-      child: Column(
-        children: <Widget>[
-          Text(
-            name,
-            style: Theme.of(context).textTheme.bodyText1,
-            strutStyle: StrutStyle(leading: 0.4),
-          ),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyText2,
-          ),
-        ],
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CustomRow extends StatelessWidget {
-  const CustomRow({
+class ChangeLocationRow extends StatelessWidget {
+  const ChangeLocationRow({
     Key key,
     this.title,
     this.value,

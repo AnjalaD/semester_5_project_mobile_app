@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
 import 'package:location/location.dart';
-import 'package:semester_5_project_mobile_app/views/profile/widgets/custom_row.dart';
+import 'package:semester_5_project_mobile_app/views/profile/widgets/change_location_row.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_button.dart';
 import 'package:semester_5_project_mobile_app/widgets/map_container.dart';
 import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
@@ -67,7 +67,7 @@ class _ChangeLocationState extends State<ChangeLocation> {
             onTap: !current ? _setMarker : null,
             mapController: mapController,
           ),
-          CustomRow(
+          ChangeLocationRow(
             value: current,
             title: 'Current Location',
             refresh: true,
@@ -78,7 +78,7 @@ class _ChangeLocationState extends State<ChangeLocation> {
               });
             },
           ),
-          CustomRow(
+          ChangeLocationRow(
             value: !current,
             title: 'Custom Location',
             onChanged: (bool value) {
