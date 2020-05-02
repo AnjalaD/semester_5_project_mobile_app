@@ -1,44 +1,122 @@
 import 'package:flutter/material.dart';
-import 'package:latlong/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong/latlong.dart';
+import 'package:location/location.dart';
 
-class MapContainer extends StatelessWidget {
-  const MapContainer({
-    Key key,
-    this.markerPosition,
-    this.center,
-    this.onTap,
-    this.mapController,
-  }) : super(key: key);
+typedef OnTap = void Function(LatLng location);
 
-  final LatLng center;
+class MapContainer extends StatefulWidget {
   final LatLng markerPosition;
-  final Function onTap;
-  final MapController mapController;
+  final OnTap onTap;
+  final bool tappable;
+
+  const MapContainer(
+      {Key key, this.markerPosition, this.onTap, this.tappable = false})
+      : super(key: key);
+
+  @override
+  MapContainerState createState() {
+    return MapContainerState();
+  }
+}
+
+class MapContainerState extends State<MapContainer>
+    with TickerProviderStateMixin {
+  // Note the addition of the TickerProviderStateMixin here. If you are getting an error like
+  // 'The class 'TickerProviderStateMixin' can't be used as a mixin because it extends a class other than Object.'
+  // in your IDE, you can probably fix it by adding an analysis_options.yaml file to your project
+  // with the following content:
+  //  analyzer:
+  //    language:
+  //      enableSuperMixins: true
+  // See https://github.com/flutter/flutter/issues/14317#issuecomment-361085869
+  // This project didn't require that change, so YMMV.
+
+  MapController mapController;
+  LatLng markerPosition;
+  Location location;
+
+  @override
+  void initState() {
+    super.initState();
+    location = new Location();
+    mapController = MapController();
+    markerPosition = this.widget.markerPosition;
+  }
+
+  void _animatedMapMove(LatLng destLocation, double destZoom) {
+    // Create some tweens. These serve to split up the transition from one location to another.
+    // In our case, we want to split the transition be<tween> our current map center and the destination.
+    final _latTween = Tween<double>(
+        begin: mapController.center.latitude, end: destLocation.latitude);
+    final _lngTween = Tween<double>(
+        begin: mapController.center.longitude, end: destLocation.longitude);
+    final _zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
+
+    // Create a animation controller that has a duration and a TickerProvider.
+    var controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    // The animation determines what path the animation will take. You can try different Curves values, although I found
+    // fastOutSlowIn to be my favorite.
+    Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+
+    controller.addListener(() {
+      mapController.move(
+          LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)),
+          _zoomTween.evaluate(animation));
+    });
+
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controller.dispose();
+      } else if (status == AnimationStatus.dismissed) {
+        controller.dispose();
+      }
+    });
+
+    controller.forward();
+  }
+
+  void _getLocation() async {
+    try {
+      LocationData locationData = await location.getLocation();
+      LatLng point = new LatLng(locationData.latitude, locationData.longitude);
+      setState(() {
+        markerPosition = point;
+      });
+      _animatedMapMove(point, 10);
+      this.widget.onTap(point);
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  void _onTap(LatLng point) {
+    setState(() {
+      markerPosition = point;
+    });
+    this.widget.onTap(point);
+  }
 
   @override
   Widget build(BuildContext context) {
-    print('center :' + center.toString());
-
-    return Container(
-      height: 250,
-      margin: EdgeInsets.only(top: 8, left: 8, right: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: FlutterMap(
-        mapController: MapController(),
-        options: MapOptions(
-          onTap: onTap,
-          center: center,
-          zoom: 10.0,
-        ),
-        layers: [
-          TileLayerOptions(
-              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              subdomains: ['a', 'b', 'c']),
-          MarkerLayerOptions(
-            markers: [
+    return Stack(
+      children: <Widget>[
+        FlutterMap(
+          mapController: mapController,
+          options: MapOptions(
+              onTap: this.widget.tappable ? _onTap : null,
+              center: new LatLng(6.9169905, 80.079268),
+              zoom: 10.0,
+              maxZoom: 15.0,
+              minZoom: 6.0),
+          layers: [
+            TileLayerOptions(
+                urlTemplate:
+                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: ['a', 'b', 'c']),
+            MarkerLayerOptions(markers: [
               Marker(
                 point: markerPosition,
                 anchorPos: AnchorPos.align(AnchorAlign.top),
@@ -48,10 +126,36 @@ class MapContainer extends StatelessWidget {
                   size: 36,
                 ),
               )
-            ],
+            ])
+          ],
+        ),
+        Positioned(
+          right: 15,
+          top: 15,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 4,
+                    color: Colors.grey,
+                  ),
+                ]),
+            child: Center(
+              child: IconButton(
+                tooltip: 'My Location',
+                iconSize: 24,
+                icon: Icon(
+                  Icons.my_location,
+                  color: Colors.white,
+                ),
+                onPressed: _getLocation,
+              ),
+            ),
           ),
-        ],
-      ),
+        )
+      ],
     );
   }
 }

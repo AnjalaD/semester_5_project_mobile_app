@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
-import 'package:location/location.dart';
-import 'package:semester_5_project_mobile_app/views/profile/widgets/change_location_row.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_button.dart';
 import 'package:semester_5_project_mobile_app/widgets/map_container.dart';
 import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
@@ -15,11 +12,7 @@ class ChangeLocation extends StatefulWidget {
 }
 
 class _ChangeLocationState extends State<ChangeLocation> {
-  final MapController mapController = new MapController();
-  final Location location = new Location();
-  LatLng markerPosition = new LatLng(7.9169905, 80.039268);
-  LatLng center = new LatLng(7.9169905, 80.039268);
-  bool current = true;
+  LatLng markerPosition = new LatLng(6.9169905, 80.079268);
   LatLng prevLocation;
 
   @override
@@ -35,69 +28,54 @@ class _ChangeLocationState extends State<ChangeLocation> {
     });
   }
 
-  void _getLocation() async {
-    print('getting location');
-    try {
-      LocationData locationData = await location.getLocation();
-      print(locationData.toString());
-      mapController.onReady.then((val) {
-        print('ready');
-        mapController.move(
-            new LatLng(locationData.latitude, locationData.longitude), 10);
-      });
-
-      setState(() {
-        markerPosition =
-            new LatLng(locationData.latitude, locationData.longitude);
-      });
-    } catch (err) {
-      print(err.toString());
-    }
+  void _setLocation() {
+    setState(() {
+      prevLocation = markerPosition;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return PageWrapper(
       title: 'Change Location',
-      body: Column(
+      body: Stack(
         children: <Widget>[
           MapContainer(
-            center: center,
             markerPosition: markerPosition,
-            onTap: !current ? _setMarker : null,
-            mapController: mapController,
+            tappable: true,
+            onTap: _setMarker,
           ),
-          ChangeLocationRow(
-            value: current,
-            title: 'Current Location',
-            refresh: true,
-            onRefresh: _getLocation,
-            onChanged: (bool value) {
-              setState(() {
-                current = value;
-              });
-            },
-          ),
-          ChangeLocationRow(
-            value: !current,
-            title: 'Custom Location',
-            onChanged: (bool value) {
-              setState(() {
-                current = !value;
-              });
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16, bottom: 8),
-            child: CustomButton(
-              labelText: 'Set New Location',
-              onPressed: markerPosition != prevLocation ? () {} : null,
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColorDark,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(25),
+                  ),
+                  boxShadow: [
+                    BoxShadow(blurRadius: 4, color: Colors.grey),
+                  ]),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CustomButton(
+                    labelText: 'Set New Location',
+                    onPressed:
+                        markerPosition != prevLocation ? _setLocation : null,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16.0, horizontal: 8),
+                    child: Text(
+                      "Lat:${markerPosition.latitude.toStringAsFixed(4)}," +
+                          " Lng:${markerPosition.longitude.toStringAsFixed(4)}",
+                      style: Theme.of(context).primaryTextTheme.caption,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            "Lat:${markerPosition.latitude.toStringAsFixed(4)}," +
-                " Lng:${markerPosition.longitude.toStringAsFixed(4)}",
-            style: Theme.of(context).textTheme.caption,
           ),
         ],
       ),
