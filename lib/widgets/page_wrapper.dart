@@ -23,25 +23,55 @@ class PageWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        actions: appBarActions ?? [],
-      ),
-      drawer: drawer,
-      body: Consumer<Authentication>(
-        builder: (context, value, child) {
-          bool loading = isLoading;
-          if (isLoading == null) {
-            loading = value != null && value.isLoading;
-          }
-          return LoadingOverlay(
-            isLoading: loading,
-            progressIndicator: CircularProgressIndicator(),
-            child: body,
-          );
-        },
-      ),
+    return Consumer<Authentication>(
+      builder: (context, value, child) {
+        bool loading = isLoading;
+        if (isLoading == null) {
+          loading = value != null && value.isLoading;
+        }
+        return LoadingOverlay(
+          isLoading: loading,
+          color: Colors.black,
+          progressIndicator: Container(
+            height: 100,
+            width: 100,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.black.withOpacity(.8),
+                boxShadow: [
+                  BoxShadow(
+                    spreadRadius: 4,
+                    blurRadius: 4,
+                    color: Colors.black26,
+                  ),
+                ]),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                ),
+                Text(
+                  'Loading...',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      decoration: TextDecoration.none),
+                )
+              ],
+            ),
+          ),
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(title),
+              actions: appBarActions ?? [],
+            ),
+            drawer: drawer,
+            body: body,
+          ),
+        );
+      },
     );
   }
 }
