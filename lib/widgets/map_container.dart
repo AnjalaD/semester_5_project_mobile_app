@@ -132,30 +132,46 @@ class MapContainerState extends State<MapContainer>
         Positioned(
           right: 15,
           top: 15,
-          child: Container(
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 4,
-                    color: Colors.grey,
-                  ),
-                ]),
-            child: Center(
-              child: IconButton(
-                tooltip: 'My Location',
-                iconSize: 24,
-                icon: Icon(
-                  Icons.my_location,
-                  color: Colors.white,
-                ),
-                onPressed: _getLocation,
-              ),
-            ),
+          child: MyLocationButton(
+            onPressed: _getLocation,
           ),
         )
       ],
+    );
+  }
+}
+
+class MyLocationButton extends StatelessWidget {
+  const MyLocationButton({
+    Key key,
+    this.onPressed,
+  }) : super(key: key);
+
+  final Function onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          // color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 4,
+              color: Colors.grey,
+            ),
+          ]),
+      child: Center(
+        child: IconButton(
+          tooltip: 'My Location',
+          iconSize: 24,
+          icon: Icon(
+            Icons.my_location,
+            color: Colors.white,
+          ),
+          onPressed: onPressed,
+        ),
+      ),
     );
   }
 }
