@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:semester_5_project_mobile_app/views/alerts/widgets/list_item.dart';
 import 'package:semester_5_project_mobile_app/widgets/drawer.dart';
+import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
 
 class AlertsList extends StatelessWidget {
   const AlertsList({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Alerts'),
-      ),
+    return PageWrapper(
+      title: 'Alerts',
       drawer: CustomDrawer(),
       body: ListView(
         children: <Widget>[

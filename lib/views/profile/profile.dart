@@ -4,16 +4,15 @@ import 'package:semester_5_project_mobile_app/services/authentication.dart';
 import 'package:semester_5_project_mobile_app/views/profile/change_location.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_button.dart';
 import 'package:semester_5_project_mobile_app/widgets/drawer.dart';
+import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
 
 class Profile extends StatelessWidget {
   const Profile({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
-      ),
+    return PageWrapper(
+      title: 'Profile',
       drawer: CustomDrawer(),
       body: Consumer<Authentication>(
         builder: (context, auth, _) => ListView(

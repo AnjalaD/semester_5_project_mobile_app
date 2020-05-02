@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:semester_5_project_mobile_app/views/alerts/widgets/alert.dart';
 import 'package:semester_5_project_mobile_app/views/alerts/widgets/emg_numbers.dart';
+import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
 
 class ViewAlert extends StatelessWidget {
   const ViewAlert({
@@ -9,10 +10,8 @@ class ViewAlert extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Alert'),
-        ),
+    return PageWrapper(
+        title: 'Alert',
         body: Alert(
           color: Colors.red[300],
           title: 'Curfew extended',

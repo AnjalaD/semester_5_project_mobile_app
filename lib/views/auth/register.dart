@@ -5,6 +5,7 @@ import 'package:semester_5_project_mobile_app/services/authentication.dart';
 import 'package:semester_5_project_mobile_app/views/auth/login.dart';
 import 'package:semester_5_project_mobile_app/views/auth/widgets/register_form.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_button.dart';
+import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
 
 class Register extends StatefulWidget {
   Register({Key key}) : super(key: key);
@@ -49,23 +50,21 @@ class _LoginState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     Authentication auth = Provider.of<Authentication>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Register'),
-        actions: <Widget>[
-          FlatButton.icon(
-            icon: Icon(Icons.person),
-            label: Text('Login'),
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => Login(),
-                ),
-              );
-            },
-          )
-        ],
-      ),
+    return PageWrapper(
+      title: 'Register',
+      appBarActions: <Widget>[
+        FlatButton.icon(
+          icon: Icon(Icons.person),
+          label: Text('Login'),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => Login(),
+              ),
+            );
+          },
+        )
+      ],
       body: ListView(
         children: <Widget>[
           Column(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/auth_wrapper.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
 import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
+import 'package:semester_5_project_mobile_app/views/profile/change_location.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,9 +23,10 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: PageWrapper(
-          child: AuthWrapper(),
-        ),
+        home: 
+        // ChangeLocation()
+        AuthWrapper()
+        ,
       ),
     );
   }

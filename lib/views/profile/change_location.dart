@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
+import 'package:location/location.dart';
+import 'package:semester_5_project_mobile_app/views/profile/widgets/custom_row.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_button.dart';
 import 'package:semester_5_project_mobile_app/widgets/map_container.dart';
+import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
 
 class ChangeLocation extends StatefulWidget {
   ChangeLocation({Key key}) : super(key: key);
@@ -11,7 +15,10 @@ class ChangeLocation extends StatefulWidget {
 }
 
 class _ChangeLocationState extends State<ChangeLocation> {
-  LatLng markerPosition = LatLng(51.5, -0.09);
+  final MapController mapController = new MapController();
+  final Location location = new Location();
+  LatLng markerPosition = new LatLng(7.9169905, 80.039268);
+  LatLng center = new LatLng(7.9169905, 80.039268);
   bool current = true;
   LatLng prevLocation;
 
@@ -28,22 +35,43 @@ class _ChangeLocationState extends State<ChangeLocation> {
     });
   }
 
+  void _getLocation() async {
+    print('getting location');
+    try {
+      LocationData locationData = await location.getLocation();
+      print(locationData.toString());
+      mapController.onReady.then((val) {
+        print('ready');
+        mapController.move(
+            new LatLng(locationData.latitude, locationData.longitude), 10);
+      });
+
+      setState(() {
+        markerPosition =
+            new LatLng(locationData.latitude, locationData.longitude);
+      });
+    } catch (err) {
+      print(err.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Change Location'),
-      ),
+    return PageWrapper(
+      title: 'Change Location',
       body: Column(
         children: <Widget>[
           MapContainer(
+            center: center,
             markerPosition: markerPosition,
             onTap: !current ? _setMarker : null,
+            mapController: mapController,
           ),
           CustomRow(
             value: current,
             title: 'Current Location',
             refresh: true,
+            onRefresh: _getLocation,
             onChanged: (bool value) {
               setState(() {
                 current = value;
@@ -72,57 +100,6 @@ class _ChangeLocationState extends State<ChangeLocation> {
             style: Theme.of(context).textTheme.caption,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class CustomRow extends StatelessWidget {
-  const CustomRow({
-    Key key,
-    this.title,
-    this.value,
-    this.onChanged,
-    this.refresh = false,
-  }) : super(key: key);
-
-  final bool refresh;
-  final String title;
-  final bool value;
-  final Function onChanged;
-
-  List<Widget> _refreshButton() {
-    List<Widget> row = [
-      Padding(
-        padding: const EdgeInsets.only(right: 16),
-        child: Switch(
-          value: value,
-          onChanged: onChanged,
-        ),
-      ),
-      Text(title),
-    ];
-    if (refresh) {
-      row.add(Padding(
-        padding: const EdgeInsets.only(right: 8.0),
-        child: IconButton(
-          icon: Icon(Icons.refresh),
-          onPressed: value ? () {} : null,
-        ),
-      ));
-    }
-    return row;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8),
-      padding: EdgeInsets.only(left: 60),
-      child: Center(
-        child: Row(
-          children: _refreshButton(),
-        ),
       ),
     );
   }

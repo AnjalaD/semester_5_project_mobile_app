@@ -5,15 +5,21 @@ import 'package:flutter_map/flutter_map.dart';
 class MapContainer extends StatelessWidget {
   const MapContainer({
     Key key,
-    @required this.markerPosition,
+    this.markerPosition,
+    this.center,
     this.onTap,
+    this.mapController,
   }) : super(key: key);
 
+  final LatLng center;
   final LatLng markerPosition;
   final Function onTap;
+  final MapController mapController;
 
   @override
   Widget build(BuildContext context) {
+    print('center :' + center.toString());
+
     return Container(
       height: 250,
       margin: EdgeInsets.only(top: 8, left: 8, right: 8),
@@ -21,10 +27,11 @@ class MapContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: FlutterMap(
+        mapController: MapController(),
         options: MapOptions(
           onTap: onTap,
-          center: LatLng(51.5, -0.09),
-          zoom: 13.0,
+          center: center,
+          zoom: 10.0,
         ),
         layers: [
           TileLayerOptions(
@@ -34,10 +41,11 @@ class MapContainer extends StatelessWidget {
             markers: [
               Marker(
                 point: markerPosition,
+                anchorPos: AnchorPos.align(AnchorAlign.top),
                 builder: (context) => Icon(
                   Icons.location_on,
                   color: Colors.red,
-                  size: 48,
+                  size: 36,
                 ),
               )
             ],
