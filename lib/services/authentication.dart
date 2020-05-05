@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:semester_5_project_mobile_app/constants/api.dart';
 import 'package:semester_5_project_mobile_app/models/proxy_user_model.dart';
 import 'package:semester_5_project_mobile_app/models/user_model.dart';
-import 'package:semester_5_project_mobile_app/services/fcm.dart';
+import 'package:semester_5_project_mobile_app/services/notification.dart';
 import 'package:semester_5_project_mobile_app/util/app_storage.dart';
 
 class Authentication extends ChangeNotifier {
@@ -50,7 +50,7 @@ class Authentication extends ChangeNotifier {
         email: 'anja@i.com',
         nic: '918123123',
         telephoneNumber: '1212414124');
-    new Fcm();
+    new NotificationService();
   }
 
   ///signIn to system
