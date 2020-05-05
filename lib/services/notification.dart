@@ -5,7 +5,7 @@ import 'package:semester_5_project_mobile_app/models/notification_data.dart';
 
 class NotificationService {
   FirebaseMessaging _fcm;
-  FlutterLocalNotificationsPlugin _notificationsPlugin;
+  static FlutterLocalNotificationsPlugin _notificationsPlugin;
 
   NotificationService() {
     _initFlnp();
@@ -13,25 +13,28 @@ class NotificationService {
   }
 
   void _initFcm() {
+    print('init firebase messaging');
     _fcm = new FirebaseMessaging();
     _fcm.configure(
+      onBackgroundMessage: onBackground,
       onMessage: (Map<String, dynamic> message) async {
-        print("onMessage: $message");
-        final NotificationData data =
-            NotificationData.fromJson(message['data']);
-        _onNotification(data);
+        print('onMessage: $message');
+        _onNotification(new NotificationData.fromJson(message['data']));
       },
       onLaunch: (Map<String, dynamic> message) async {
         print("onLaunch: $message");
+        _onNotification(new NotificationData.fromJson(message['data']));
       },
       onResume: (Map<String, dynamic> message) async {
         print("onResume: $message");
+        _onNotification(new NotificationData.fromJson(message['data']));
       },
     );
     _fcm.getToken().then((val) => print(val));
   }
 
   void _initFlnp() {
+    print('init local notifications');
     _notificationsPlugin = new FlutterLocalNotificationsPlugin();
 
     AndroidInitializationSettings initAndroid =
@@ -45,16 +48,21 @@ class NotificationService {
     _notificationsPlugin.initialize(initSettings);
   }
 
-  _onNotification(NotificationData data) {
+  static Future<void> _onNotification(NotificationData data) async {
+    print('onNotification');
     final Distance distance = new Distance();
+    print(
+        distance.as(LengthUnit.Kilometer, data.center, data.center).toString());
+
     if (distance.as(LengthUnit.Kilometer, data.center, data.center) <=
         data.radius) {
       //show notification
-      _showNotification(data.title, data.description);
+      await _showNotification(data.title, data.description);
     }
   }
 
-  _showNotification(String title, String description) async {
+  static Future<void> _showNotification(
+      String title, String description) async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
       'your channel id',
       'your channel name',
@@ -72,5 +80,10 @@ class NotificationService {
       platformChannelSpecifics,
       payload: 'Default_Sound',
     );
+  }
+
+  static Future<dynamic> onBackground(Map<String, dynamic> message) async {
+    print('onMessage: $message');
+    _onNotification(new NotificationData.fromJson(message['data']));
   }
 }
