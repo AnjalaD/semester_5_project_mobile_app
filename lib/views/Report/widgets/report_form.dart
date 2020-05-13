@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:semester_5_project_mobile_app/models/incident_report.dart';
+import 'package:semester_5_project_mobile_app/util/request_handler.dart';
 import 'package:semester_5_project_mobile_app/util/validators/empty_validator.dart';
 import 'package:semester_5_project_mobile_app/util/validators/form_validator.dart';
+import 'package:semester_5_project_mobile_app/views/Report/widgets/add_image.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_text_field.dart';
 import 'package:semester_5_project_mobile_app/widgets/map_container.dart';
 import 'package:latlong/latlong.dart';
@@ -16,13 +21,33 @@ class ReportForm extends StatefulWidget {
 
 class _ReportFormState extends State<ReportForm> {
   int _step = 0;
-  LatLng markerPosition = LatLng(51.5, -0.09);
+
+  final _details = TextEditingController();
+  final _type = TextEditingController();
+  File _image;
+  LatLng _markerPosition = LatLng(51.5, -0.09);
 
   void _setMarker(LatLng point) {
     print(point.toString());
     setState(() {
-      markerPosition = point;
+      _markerPosition = point;
     });
+  }
+
+  void _addImageOnChanged(File newImage) {
+    _image = newImage;
+  }
+
+  Future<void> _sendReport() async {
+    print('sendReport');
+    IncidentReport report = new IncidentReport(
+      _type.text,
+      _details.text,
+      _markerPosition,
+      _image,
+    );
+    bool res = await ApiRequestHandler.sendReport(incidentReport: report);
+    print(res);
   }
 
   @override
@@ -70,25 +95,46 @@ class _ReportFormState extends State<ReportForm> {
           isActive: _step == 1,
           title: Text('Location'),
           subtitle: Text('Location of the incident'),
-          content: MapContainer(
-            markerPosition: markerPosition,
-            onTap: _setMarker,
+          content: Container(
+            height: 300,
+            child: MapContainer(
+              markerPosition: _markerPosition,
+              onTap: _setMarker,
+              tappable: true,
+            ),
           ),
         ),
         Step(
           isActive: _step == 2,
           title: Text('Image'),
           subtitle: Text('Image of the incident (optional)'),
-          content: Image.asset('image.jpg'),
+          content: AddImage(
+            onChange: _addImageOnChanged,
+          ),
         ),
         Step(
           state: StepState.complete,
           isActive: _step == 3,
           title: Text('Send'),
           subtitle: Text('Send Report'),
-          content: Text('Send report'),
-        )
+          content: Container(),
+        ),
       ],
+      physics: ClampingScrollPhysics(),
+      controlsBuilder: (context, {onStepCancel, onStepContinue}) => ButtonBar(
+        buttonMinWidth: 100,
+        children: <Widget>[
+          OutlineButton(
+            child: Text('Cancel'),
+            onPressed: onStepCancel,
+          ),
+          RaisedButton(
+            color: Theme.of(context).primaryColor,
+            child: Text(_step == 3 ? 'Submit' : 'Next'),
+            onPressed: _step == 3 ? _sendReport : onStepContinue,
+          )
+        ],
+      ),
     );
   }
 }

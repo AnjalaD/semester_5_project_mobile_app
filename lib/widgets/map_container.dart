@@ -22,16 +22,6 @@ class MapContainer extends StatefulWidget {
 
 class MapContainerState extends State<MapContainer>
     with TickerProviderStateMixin {
-  // Note the addition of the TickerProviderStateMixin here. If you are getting an error like
-  // 'The class 'TickerProviderStateMixin' can't be used as a mixin because it extends a class other than Object.'
-  // in your IDE, you can probably fix it by adding an analysis_options.yaml file to your project
-  // with the following content:
-  //  analyzer:
-  //    language:
-  //      enableSuperMixins: true
-  // See https://github.com/flutter/flutter/issues/14317#issuecomment-361085869
-  // This project didn't require that change, so YMMV.
-
   MapController mapController;
   LatLng markerPosition;
   Location location;

@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:semester_5_project_mobile_app/constants/api.dart';
 import 'package:semester_5_project_mobile_app/models/proxy_user_model.dart';
 import 'package:semester_5_project_mobile_app/models/user_model.dart';
 import 'package:semester_5_project_mobile_app/services/notification.dart';
 import 'package:semester_5_project_mobile_app/util/app_storage.dart';
+import 'package:semester_5_project_mobile_app/util/request_handler.dart';
 
 class Authentication extends ChangeNotifier {
   final Dio _dio = new Dio();
@@ -61,20 +61,9 @@ class Authentication extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    try {
-      Response response = await _dio.post(
-        Api.kSignInApi,
-        data: {
-          "nic": nic,
-          "password": password,
-        },
-        options: Options(
-          validateStatus: (status) {
-            return true;
-          },
-        ),
-      );
-      Map<String, dynamic> data = _responseHandler(response);
+    Map<String, dynamic> data =
+        ApiRequestHandler.login(nic: nic, password: password);
+    if (data != null) {
       _proxyUser = ProxyUser.fromJson(data);
       // print(_proxyUser.toJson());
       if (keepSignedIn) {
@@ -82,8 +71,6 @@ class Authentication extends ChangeNotifier {
         _storage.storeSignInData(_proxyUser);
       }
       await _getUser();
-    } catch (err) {
-      print(err.toString());
     }
 
     _isLoading = false;
@@ -95,24 +82,11 @@ class Authentication extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    try {
-      Response response = await _dio.post(
-        Api.kSignUpApi,
-        data: user.toJson(),
-        options: Options(
-          validateStatus: (status) {
-            print(status);
-            return true;
-          },
-        ),
-      );
-      print(response.toString());
-      Map<String, dynamic> data = _responseHandler(response);
+    Map<String, dynamic> data = ApiRequestHandler.register(user);
+    if (data != null) {
       _proxyUser = ProxyUser.fromJson(data);
       print(_proxyUser.toJson());
       await _getUser();
-    } catch (err) {
-      print(err.toString());
     }
 
     _isLoading = false;
@@ -139,40 +113,16 @@ class Authentication extends ChangeNotifier {
   /// if successfull create [_user]
   /// else [_user] set to null
   _getUser() async {
-    try {
-      Response response = await _dio.get(
-        "${Api.kGetUserApi}/${_proxyUser.id}",
-        options: Options(
-          headers: {
-            "Auth": _proxyUser.token,
-          },
-          validateStatus: (status) {
-            return true;
-          },
-        ),
-      );
-      // print(response.data["userdata"]);
-      Map<String, dynamic> data = _responseHandler(response);
+    // print(response.data["userdata"]);
+    Map<String, dynamic> data = ApiRequestHandler.getUserInfo(
+      userId: _proxyUser.id,
+      token: _proxyUser.token,
+    );
+    if (data != null) {
       _user = new User.fromJson(data["userdata"]);
       return true;
-    } catch (err) {
-      print(err.toString());
     }
-
     _proxyUser = null;
     return false;
-  }
-
-  dynamic _responseHandler(Response response) {
-    switch (response.statusCode) {
-      case 200:
-        return response.data;
-      case 401:
-        throw response.data["message"];
-      case 406:
-        throw response.data["message"];
-      default:
-        throw "Unexpected error occured :${response.statusCode}";
-    }
   }
 }

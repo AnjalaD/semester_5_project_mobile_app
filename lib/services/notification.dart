@@ -83,6 +83,7 @@ class NotificationService {
   }
 
   static Future<dynamic> onBackground(Map<String, dynamic> message) async {
+    _showNotification('afsaf', 'sfafasfsaf');
     print('onMessage: $message');
     _onNotification(new NotificationData.fromJson(message['data']));
   }
