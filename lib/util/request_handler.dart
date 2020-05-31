@@ -1,12 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:semester_5_project_mobile_app/constants/api.dart';
 import 'package:semester_5_project_mobile_app/models/incident_report.dart';
+import 'package:semester_5_project_mobile_app/models/update_user_model.dart';
 import 'package:semester_5_project_mobile_app/models/user_model.dart';
+import 'package:semester_5_project_mobile_app/util/classes/response.dart';
 
 class ApiRequestHandler {
-  static final Dio _dio = Dio();
+  static final Dio _dio = Dio(BaseOptions(
+    connectTimeout: 10000,
+    receiveTimeout: 10000,
+    validateStatus: (status) {
+      return true;
+    },
+  ));
 
-  static dynamic login({String nic, String password}) async {
+  static Future<ProcessedResponse> login({String nic, String password}) async {
+    print('calling login api...');
+
     try {
       Response response = await _dio.post(
         Api.kSignInApi,
@@ -14,92 +24,176 @@ class ApiRequestHandler {
           "nic": nic,
           "password": password,
         },
-        options: Options(
-          validateStatus: (status) {
-            return true;
-          },
-        ),
       );
       Map<String, dynamic> data = _responseHandler(response);
-      return data;
+      print('end...........');
+
+      return ProcessedResponse(data: data);
     } catch (err) {
-      return null;
+      print('error............');
+
+      return ProcessedResponse(error: err.toString());
     }
   }
 
-  static dynamic register(User user) async {
+  static Future<ProcessedResponse> register(User user) async {
+    print('calling register api...');
+
     try {
       Response response = await _dio.post(
         Api.kSignUpApi,
         data: user.toJson(),
-        options: Options(
-          validateStatus: (status) {
-            print(status);
-            return true;
-          },
-        ),
       );
-      print(response.toString());
       Map<String, dynamic> data = _responseHandler(response);
-      return data;
+      print('end...........');
+      return ProcessedResponse(data: data);
     } catch (err) {
-      return null;
+      print('error............');
+      return ProcessedResponse(error: err.toString());
     }
   }
 
-  static dynamic getUserInfo({String userId, String token}) async {
+  static Future<ProcessedResponse> getUserInfo(
+      {String userId, String token}) async {
+    print('calling getuserinfo api...');
+
     try {
       Response response = await _dio.get(
         "${Api.kGetUserApi}/$userId",
         options: Options(
           headers: {
-            "Auth": token,
-          },
-          validateStatus: (status) {
-            return true;
+            "Authorization": "Bearer $token",
           },
         ),
       );
       Map<String, dynamic> data = _responseHandler(response);
-      return data;
+      print('end...........');
+      return ProcessedResponse(data: data);
     } catch (err) {
-      return null;
+      print('error............');
+      return ProcessedResponse(error: err.toString());
     }
   }
 
-  static dynamic sendReport({IncidentReport incidentReport}) async {
-    Map<String, dynamic> postData = incidentReport.toJson();
-    if (incidentReport.image != null) {
-      postData['file'] =
-          await MultipartFile.fromFile(incidentReport.image.path);
-    }
-    print(postData);
+  static Future<bool> sendReport({
+    IncidentReport incidentReport,
+    String token,
+  }) async {
+    print('report :${incidentReport.toJson()}');
     try {
+      print('calling sendreport api...');
+
       Response response = await _dio.post(
-        Api.kSignUpApi,
-        data: FormData.fromMap(postData),
+        Api.kSendReportApi,
+        data: FormData.fromMap(incidentReport.toJson()),
+        // onSendProgress: (count, total) =>
+        //     print('send :${(count / total) * 100}'),
+        // onReceiveProgress: (count, total) =>
+        //     print('receive :${(count / total) * 100}'),
         options: Options(
-          validateStatus: (status) {
-            return true;
+          contentType: 'multipart/form-data',
+          headers: {
+            "Authorization": "Bearer $token",
           },
         ),
       );
+      print("Response: $response");
       Map<String, dynamic> data = _responseHandler(response);
-      print(data);
-      return data;
+      print("Response: $data");
+      return true;
     } catch (err) {
-      return null;
+      print("error sendError: $err");
+      return false;
+    }
+  }
+
+  static Future<bool> updateUser({UpdateUser user, String token}) async {
+    print('calling update-userinfo api...');
+
+    try {
+      Response response = await _dio.put(
+        Api.kUpdateUserApi,
+        data: user.toJson(),
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+      _responseHandler(response);
+      print('end...........');
+      return true;
+    } catch (err) {
+      print('error............');
+      return false;
+    }
+  }
+
+  static Future<bool> deleteUser({String token}) async {
+    print('calling delete-user api...');
+
+    try {
+      Response response = await _dio.delete(
+        Api.kDeleteUserApi,
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+      _responseHandler(response);
+      print('end...........');
+      return true;
+    } catch (err) {
+      print('error............');
+      return false;
+    }
+  }
+
+  static Future<bool> changePassword(
+      {String nic,
+      String oldPassword,
+      String newPassword,
+      String token}) async {
+    print('calling change password api...');
+
+    try {
+      Response response = await _dio.post(
+        Api.kChangePasswordApi,
+        data: {
+          "nic": nic,
+          "oldPassword": oldPassword,
+          "newPassword": newPassword,
+        },
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+      _responseHandler(response);
+      print('end...........');
+      return true;
+    } catch (err) {
+      print('error............');
+      return false;
     }
   }
 
   static dynamic _responseHandler(Response response) {
+    print('res :$response');
+
     switch (response.statusCode) {
       case 200:
+        return response.data;
+      case 201:
         return response.data;
       case 401:
         throw response.data["message"];
       case 406:
         throw response.data["message"];
+      case 500:
+        throw response.data ? response.data["message"] : 'Server error';
       default:
         throw "Unexpected error occured :${response.statusCode}";
     }
