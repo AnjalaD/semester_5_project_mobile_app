@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
-import 'package:semester_5_project_mobile_app/views/profile/change_location.dart';
+import 'package:semester_5_project_mobile_app/util/request_handler.dart';
+import 'package:semester_5_project_mobile_app/views/profile/chnage_password.dart';
+import 'package:semester_5_project_mobile_app/views/profile/edit.dart';
 import 'package:semester_5_project_mobile_app/views/profile/widgets/profile_row.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_button.dart';
 import 'package:semester_5_project_mobile_app/widgets/drawer.dart';
@@ -14,6 +16,18 @@ class Profile extends StatelessWidget {
   Widget build(BuildContext context) {
     return PageWrapper(
       title: 'Profile',
+      appBarActions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.edit),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => EditProfile(),
+              ),
+            );
+          },
+        )
+      ],
       drawer: CustomDrawer(),
       body: Consumer<Authentication>(
         builder: (context, auth, _) => ListView(
@@ -45,24 +59,32 @@ class Profile extends StatelessWidget {
               name: 'Telephone',
               value: auth.user.telephoneNumber,
             ),
-            ProfileRow(
-              name: 'Location',
-              value: auth.user.location == null
-                  ? 'Please set your location'
-                  : "Lat:${auth.user.location.latitude.toStringAsFixed(4)}," +
-                      " Lng:${auth.user.location.longitude.toStringAsFixed(4)}",
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Center(
+                child: CustomButton(
+                  labelText: 'Change Password',
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ChangePassword(),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
             Padding(
               padding: EdgeInsets.all(20),
               child: Center(
                 child: CustomButton(
-                  labelText: 'Change Location',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ChangeLocation(),
-                      ),
-                    );
+                  color: Colors.red,
+                  labelText: 'Delete Account',
+                  onPressed: () async {
+                    auth.isLoading = true;
+                    bool result =
+                        await ApiRequestHandler.deleteUser(token: 'sfass');
+                    auth.isLoading = false;
                   },
                 ),
               ),
