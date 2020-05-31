@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:latlong/latlong.dart';
 import 'package:semester_5_project_mobile_app/models/notification_data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
   FirebaseMessaging _fcm;
@@ -12,7 +13,7 @@ class NotificationService {
     _initFcm();
   }
 
-  void _initFcm() {
+  void _initFcm() async {
     print('init firebase messaging');
     _fcm = new FirebaseMessaging();
     _fcm.configure(
@@ -30,7 +31,9 @@ class NotificationService {
         _onNotification(new NotificationData.fromJson(message['data']));
       },
     );
-    _fcm.getToken().then((val) => print(val));
+    String token = await _fcm.getToken();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('fcm_token_push', token);
   }
 
   void _initFlnp() {
@@ -52,7 +55,7 @@ class NotificationService {
     print('onNotification');
     final Distance distance = new Distance();
     print(
-        distance.as(LengthUnit.Kilometer, data.center, data.center).toString());
+        'distance: ${distance.as(LengthUnit.Kilometer, data.center, data.center)}');
 
     if (distance.as(LengthUnit.Kilometer, data.center, data.center) <=
         data.radius) {
