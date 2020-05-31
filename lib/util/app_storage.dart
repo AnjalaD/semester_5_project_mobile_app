@@ -13,8 +13,9 @@ class AppStorage {
         return ProxyUser(id: id, token: token);
       }
     } catch (err) {
-      print(err.toString());
+      print('getSignIn data storage error: $err');
     }
+    clearStorage();
     return null;
   }
 
@@ -23,7 +24,7 @@ class AppStorage {
       await storage.write(key: 'id', value: proxyUser.id);
       await storage.write(key: 'token', value: proxyUser.token);
     } catch (err) {
-      print(err.toString());
+      print('store signin data error :$err');
     }
   }
 
@@ -31,7 +32,7 @@ class AppStorage {
     try {
       await storage.deleteAll();
     } catch (err) {
-      print(err.toString());
+      print('clearStorage error : $err');
     }
   }
 }

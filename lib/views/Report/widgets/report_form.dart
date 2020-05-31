@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/models/incident_report.dart';
+import 'package:semester_5_project_mobile_app/services/authentication.dart';
+import 'package:semester_5_project_mobile_app/util/classes/report_category.dart';
 import 'package:semester_5_project_mobile_app/util/request_handler.dart';
-import 'package:semester_5_project_mobile_app/util/validators/empty_validator.dart';
-import 'package:semester_5_project_mobile_app/util/validators/form_validator.dart';
 import 'package:semester_5_project_mobile_app/views/Report/widgets/add_image.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_text_field.dart';
 import 'package:semester_5_project_mobile_app/widgets/map_container.dart';
@@ -22,13 +23,13 @@ class ReportForm extends StatefulWidget {
 class _ReportFormState extends State<ReportForm> {
   int _step = 0;
 
-  final _details = TextEditingController();
-  final _type = TextEditingController();
+  final _description = TextEditingController();
+  final _title = TextEditingController();
+  final _category = ReportCategory();
   File _image;
-  LatLng _markerPosition = LatLng(51.5, -0.09);
+  LatLng _markerPosition;
 
   void _setMarker(LatLng point) {
-    print(point.toString());
     setState(() {
       _markerPosition = point;
     });
@@ -38,20 +39,27 @@ class _ReportFormState extends State<ReportForm> {
     _image = newImage;
   }
 
-  Future<void> _sendReport() async {
-    print('sendReport');
-    IncidentReport report = new IncidentReport(
-      _type.text,
-      _details.text,
-      _markerPosition,
-      _image,
-    );
-    bool res = await ApiRequestHandler.sendReport(incidentReport: report);
-    print(res);
-  }
+  Function _sendReport(Authentication auth) => () async {
+        print('sendReport');
+        IncidentReport report = new IncidentReport(
+          categories: _category,
+          title: _title.text,
+          description: _description.text,
+          location: _markerPosition,
+          image: _image,
+        );
+
+        auth.isLoading = true;
+        bool res = await ApiRequestHandler.sendReport(
+            incidentReport: report, token: auth.proxyUser.token);
+        auth.isLoading = false;
+        print('sendReport res: $res');
+      };
 
   @override
   Widget build(BuildContext context) {
+    Authentication auth = Provider.of<Authentication>(context);
+
     return Stepper(
       onStepTapped: (int step) {
         setState(() {
@@ -78,15 +86,17 @@ class _ReportFormState extends State<ReportForm> {
           subtitle: Text('Enter details'),
           content: Column(
             children: <Widget>[
+              Wrap(
+                children: _buildTypes(),
+              ),
               CustomTextField(
-                labelText: 'Type',
-                validator: Validator.validator([
-                  EmptyValidator(),
-                ]),
+                labelText: 'Title',
+                textEditingController: _title,
               ),
               CustomTextField(
                 labelText: 'Details',
                 lines: 3,
+                textEditingController: _description,
               ),
             ],
           ),
@@ -125,16 +135,39 @@ class _ReportFormState extends State<ReportForm> {
         buttonMinWidth: 100,
         children: <Widget>[
           OutlineButton(
-            child: Text('Cancel'),
+            child: Text('Back'),
             onPressed: onStepCancel,
           ),
           RaisedButton(
             color: Theme.of(context).primaryColor,
             child: Text(_step == 3 ? 'Submit' : 'Next'),
-            onPressed: _step == 3 ? _sendReport : onStepContinue,
+            onPressed: _step == 3 ? _sendReport(auth) : onStepContinue,
           )
         ],
       ),
     );
+  }
+
+  List<Widget> _buildTypes() {
+    List<Widget> chips = [];
+    ReportCategory.types.forEach((name, value) {
+      Widget chip = InputChip(
+        showCheckmark: false,
+        selectedColor: Theme.of(context).primaryColor,
+        label: Text(name),
+        selected: _category.selected.contains(value),
+        onSelected: (selected) {
+          setState(() {
+            if (selected) {
+              _category.add(value);
+            } else {
+              _category.remove(value);
+            }
+          });
+        },
+      );
+      chips.add(chip);
+    });
+    return chips;
   }
 }

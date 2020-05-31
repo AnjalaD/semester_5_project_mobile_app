@@ -17,16 +17,22 @@ class _LoginState extends State<Login> {
   final TextEditingController _nic = new TextEditingController();
   final TextEditingController _password = new TextEditingController();
   bool checked = false;
+  String error;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  _loginHandler(Authentication auth) => () {
+  _loginHandler(Authentication auth) => () async {
         final FormState form = _formKey.currentState;
         if (form.validate()) {
-          auth.signIn(
+          String err = await auth.signIn(
               nic: _nic.text, password: _password.text, keepSignedIn: checked);
           // Navigator.of(context).pushReplacement(
           //     MaterialPageRoute(builder: (context) => AlertsList()));
+          if (err != null) {
+            setState(() {
+              error = err;
+            });
+          }
         }
       };
 
@@ -65,6 +71,13 @@ class _LoginState extends State<Login> {
                     });
                   },
                   controlAffinity: ListTileControlAffinity.leading,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    error != null ? "*$error" : '',
+                    style: TextStyle(color: Colors.red),
+                  ),
                 ),
                 CustomButton(
                   labelText: 'Login',

@@ -22,7 +22,7 @@ class _ChangeLocationState extends State<ChangeLocation> {
   }
 
   void _setMarker(LatLng point) {
-    print(point.toString());
+    print('marker pos: $point');
     setState(() {
       markerPosition = point;
     });

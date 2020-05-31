@@ -53,87 +53,126 @@ class RegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MatchVatidator passwordMatchValidator =
+        new MatchVatidator(checkWith: _password.text, label: 'Password');
     return Form(
       key: _formKey,
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(10),
-          ),
-          CustomTextField(
-            labelText: 'First Name',
-            textEditingController: _fistName,
-            validator: Validator.validator(
-              [EmptyValidator()],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: CustomTextField(
+                    labelText: 'First Name',
+                    textEditingController: _fistName,
+                    validator: Validator.validator(
+                      [EmptyValidator()],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    labelText: 'Last Name',
+                    textEditingController: _lastName,
+                    validator: Validator.validator(
+                      [EmptyValidator()],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          CustomTextField(
-            labelText: 'Last Name',
-            textEditingController: _lastName,
-            validator: Validator.validator(
-              [EmptyValidator()],
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: CustomTextField(
+                    labelText: 'NIC No.',
+                    textEditingController: _nicNo,
+                    validator: Validator.validator(
+                      [NicValidator()],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    labelText: 'Date of birth',
+                    textEditingController: _dob,
+                  ),
+                ),
+              ],
             ),
-          ),
-          CustomTextField(
-            labelText: 'NIC No.',
-            textEditingController: _nicNo,
-            validator: Validator.validator(
-              [NicValidator()],
+            CustomTextField(
+              labelText: 'Email',
+              textEditingController: _email,
+              validator: Validator.validator(
+                [EmailValidator()],
+              ),
             ),
-          ),
-          CustomTextField(
-            labelText: 'Date of birth',
-            textEditingController: _dob,
-          ),
-          CustomTextField(
-            labelText: 'Email',
-            textEditingController: _email,
-            validator: Validator.validator(
-              [EmailValidator()],
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: CustomTextField(
+                    labelText: 'Address Line-1',
+                    textEditingController: _addressLine1,
+                    validator: Validator.validator(
+                      [EmptyValidator()],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    labelText: 'Address Line-2',
+                    textEditingController: _addressLine2,
+                  ),
+                ),
+              ],
             ),
-          ),
-          CustomTextField(
-            labelText: 'Address Line-1',
-            textEditingController: _addressLine1,
-            validator: Validator.validator(
-              [EmptyValidator()],
+            CustomTextField(
+              labelText: 'City',
+              textEditingController: _city,
+              validator: Validator.validator(
+                [EmptyValidator()],
+              ),
             ),
-          ),
-          CustomTextField(
-            labelText: 'Address Line-2',
-            textEditingController: _addressLine2,
-          ),
-          CustomTextField(
-            labelText: 'City',
-            textEditingController: _city,
-            validator: Validator.validator(
-              [EmptyValidator()],
+            CustomTextField(
+              labelText: 'Telephone No.',
+              textEditingController: _teleNo,
+              validator: Validator.validator(
+                [TelephoneValidator()],
+              ),
             ),
-          ),
-          CustomTextField(
-            labelText: 'Telephone No.',
-            textEditingController: _teleNo,
-            validator: Validator.validator(
-              [TelephoneValidator()],
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: CustomTextField(
+                    labelText: 'Password',
+                    textEditingController: _password,
+                    isPassword: true,
+                    onChanged: (val) {
+                      passwordMatchValidator.checkWith = _password.text;
+                    },
+                    validator: Validator.validator(
+                      [MinValidator(6), PasswordValidator()],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    labelText: 'Re-Type',
+                    textEditingController: _confirmPassword,
+                    isPassword: true,
+                    validator: Validator.validator(
+                      [
+                        passwordMatchValidator,
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          CustomTextField(
-            labelText: 'Password',
-            textEditingController: _password,
-            isPassword: true,
-            validator: Validator.validator(
-              [MinValidator(6), PasswordValidator()],
-            ),
-          ),
-          CustomTextField(
-            labelText: 'Re-Enter Password',
-            textEditingController: _confirmPassword,
-            isPassword: true,
-            validator: Validator.validator(
-              [MatchVatidator(checkWith: _password.text, label: 'Password')],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

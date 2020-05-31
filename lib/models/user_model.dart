@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:latlong/latlong.dart';
 
 class User {
   final String nic;
   final String firstName;
   final String lastName;
-  final String addressLine1;
-  final String addressLine2;
-  final String city;
+  String addressLine1;
+  String addressLine2;
+  String city;
   final String dob;
-  final String email;
-  final String telephoneNumber;
+  String email;
+  String telephoneNumber;
   final String password;
-  final LatLng location;
 
   User({
     @required this.nic,
@@ -25,7 +23,6 @@ class User {
     @required this.email,
     @required this.telephoneNumber,
     this.password,
-    this.location,
   });
 
   User.fromJson(Map<String, dynamic> json)
@@ -38,7 +35,6 @@ class User {
         dob = json['dob'],
         email = json['email'],
         telephoneNumber = json['telephone_number'],
-        location = null,
         password = null;
 
   Map<String, dynamic> toJson() => {

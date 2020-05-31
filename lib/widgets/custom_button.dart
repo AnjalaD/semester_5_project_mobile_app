@@ -5,8 +5,10 @@ class CustomButton extends StatelessWidget {
     Key key,
     @required this.labelText,
     @required this.onPressed,
+    this.color,
   }) : super(key: key);
 
+  final Color color;
   final String labelText;
   final Function onPressed;
 
@@ -19,6 +21,7 @@ class CustomButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(25),
       ),
       child: RaisedButton(
+        color: color,
         onPressed: onPressed,
         child: Text(labelText),
         textColor: Colors.white,

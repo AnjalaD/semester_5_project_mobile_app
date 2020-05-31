@@ -8,34 +8,35 @@ class CustomTextField extends StatelessWidget {
   final bool isPassword;
   final int lines;
   final FormValidator validator;
+  final void Function(String) onChanged;
 
-  const CustomTextField(
-      {Key key,
-      this.textEditingController,
-      this.hintText,
-      this.isPassword = false,
-      this.lines = 1,
-      this.labelText,
-      this.validator})
-      : super(key: key);
+  const CustomTextField({
+    Key key,
+    this.textEditingController,
+    this.hintText,
+    this.isPassword = false,
+    this.lines = 1,
+    this.labelText,
+    this.validator,
+    this.onChanged,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
-        validator: validator,
-        decoration: InputDecoration(
-          hintText: hintText,
-          labelText: labelText,
-          border: OutlineInputBorder(
-            borderSide: BorderSide(),
-          ),
+    return TextFormField(
+      validator: validator,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: hintText,
+        labelText: labelText,
+        counterText: ' ',
+        border: OutlineInputBorder(
+          borderSide: BorderSide(),
         ),
-        maxLines: lines,
-        obscureText: isPassword,
-        controller: textEditingController,
       ),
+      maxLines: lines,
+      obscureText: isPassword,
+      controller: textEditingController,
     );
   }
 }
