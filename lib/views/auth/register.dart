@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/models/user_model.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
+import 'package:semester_5_project_mobile_app/services/messages.dart';
 import 'package:semester_5_project_mobile_app/views/auth/login.dart';
 import 'package:semester_5_project_mobile_app/views/auth/widgets/register_form.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_button.dart';
@@ -27,11 +28,12 @@ class _LoginState extends State<Register> {
   final TextEditingController _city = new TextEditingController();
   final TextEditingController _password = new TextEditingController();
   final TextEditingController _confirmPassword = new TextEditingController();
+  String error;
 
-  _registerHandler(Authentication auth) => () {
+  _registerHandler(Authentication auth, Messages messages) => () async {
         if (_formKey.currentState.validate()) {
           print('registring...');
-          auth.register(
+          String err = await auth.register(
               user: new User(
             nic: _nicNo.text,
             firstName: _firstName.text,
@@ -44,12 +46,21 @@ class _LoginState extends State<Register> {
             city: _city.text,
             password: _password.text,
           ));
+
+          if (err != null) {
+            setState(() {
+              error = err;
+            });
+          } else {
+            messages.add('Registration Complete. Please Login');
+          }
         }
       };
 
   @override
   Widget build(BuildContext context) {
     Authentication auth = Provider.of<Authentication>(context);
+    Messages messages = Provider.of<Messages>(context);
     return PageWrapper(
       title: 'Register',
       appBarActions: <Widget>[
@@ -83,9 +94,16 @@ class _LoginState extends State<Register> {
                 password: _password,
                 confirmPassword: _confirmPassword,
               ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  error != null ? "*$error" : '',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
               CustomButton(
                 labelText: 'Register',
-                onPressed: _registerHandler(auth),
+                onPressed: _registerHandler(auth, messages),
               )
             ],
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
+import 'package:semester_5_project_mobile_app/services/messages.dart';
 
 class PageWrapper extends StatelessWidget {
   const PageWrapper(
@@ -23,8 +24,8 @@ class PageWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Authentication>(
-      builder: (context, value, child) {
+    return Consumer2<Authentication, Messages>(
+      builder: (context, value, messages, child) {
         bool loading = isLoading;
         if (isLoading == null) {
           loading = value != null && value.isLoading;
@@ -68,7 +69,25 @@ class PageWrapper extends StatelessWidget {
               actions: appBarActions ?? [],
             ),
             drawer: drawer,
-            body: body,
+            body: Builder(
+              builder: (context) {
+                Future.delayed(Duration.zero, () {
+                  if (messages.message != null) {
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(messages.message),
+                      action: SnackBarAction(
+                        label: 'Close',
+                        onPressed: () {
+                          messages.close();
+                        },
+                      ),
+                      duration: Duration(seconds: 10),
+                    ));
+                  }
+                });
+                return body;
+              },
+            ),
           ),
         );
       },
