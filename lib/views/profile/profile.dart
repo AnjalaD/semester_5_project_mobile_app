@@ -1,16 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
+import 'package:semester_5_project_mobile_app/services/messages.dart';
 import 'package:semester_5_project_mobile_app/util/request_handler.dart';
 import 'package:semester_5_project_mobile_app/views/profile/chnage_password.dart';
 import 'package:semester_5_project_mobile_app/views/profile/edit.dart';
 import 'package:semester_5_project_mobile_app/views/profile/widgets/profile_row.dart';
 import 'package:semester_5_project_mobile_app/widgets/custom_button.dart';
+import 'package:semester_5_project_mobile_app/widgets/custom_text_field.dart';
 import 'package:semester_5_project_mobile_app/widgets/drawer.dart';
 import 'package:semester_5_project_mobile_app/widgets/page_wrapper.dart';
 
 class Profile extends StatelessWidget {
   const Profile({Key key}) : super(key: key);
+
+  void _confirmDelete(
+      BuildContext context, Authentication auth, Messages messages) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        final password = TextEditingController();
+        return AlertDialog(
+            title: Text('Confirm Account Delete'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CustomTextField(
+                  labelText: 'Password',
+                  isPassword: true,
+                  textEditingController: password,
+                ),
+                CustomButton(
+                  color: Colors.red,
+                  labelText: 'Delete',
+                  onPressed: () async {
+                    bool res = await ApiRequestHandler.deleteUser(
+                      token: auth.proxyUser.token,
+                      password: password.text,
+                    );
+                    if (res) {
+                      auth.signOut();
+                      messages.add('Account Deleted!');
+                      return;
+                    }
+                    messages.add('Error Occured, Please try again!');
+                  },
+                )
+              ],
+            ));
+      },
+    );
+  }
+
+  void _gotoPage(Widget page, BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => page,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +68,12 @@ class Profile extends StatelessWidget {
       appBarActions: <Widget>[
         IconButton(
           icon: Icon(Icons.edit),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => EditProfile(),
-              ),
-            );
-          },
+          onPressed: () => _gotoPage(EditProfile(), context),
         )
       ],
       drawer: CustomDrawer(),
-      body: Consumer<Authentication>(
-        builder: (context, auth, _) => ListView(
+      body: Consumer2<Authentication, Messages>(
+        builder: (context, auth, messages, _) => ListView(
           children: <Widget>[
             Container(
               height: 140,
@@ -64,13 +107,7 @@ class Profile extends StatelessWidget {
               child: Center(
                 child: CustomButton(
                   labelText: 'Change Password',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ChangePassword(),
-                      ),
-                    );
-                  },
+                  onPressed: () => _gotoPage(ChangePassword(), context),
                 ),
               ),
             ),
@@ -80,12 +117,7 @@ class Profile extends StatelessWidget {
                 child: CustomButton(
                   color: Colors.red,
                   labelText: 'Delete Account',
-                  onPressed: () async {
-                    auth.isLoading = true;
-                    bool result =
-                        await ApiRequestHandler.deleteUser(token: 'sfass');
-                    auth.isLoading = false;
-                  },
+                  onPressed: () => _confirmDelete(context, auth, messages),
                 ),
               ),
             )
