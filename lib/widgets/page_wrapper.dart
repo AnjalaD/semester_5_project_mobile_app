@@ -81,7 +81,7 @@ class PageWrapper extends StatelessWidget {
                           messages.close();
                         },
                       ),
-                      duration: Duration(seconds: 10),
+                      duration: Duration(seconds: 5),
                     ));
                   }
                 });

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/models/update_user_model.dart';
-import 'package:semester_5_project_mobile_app/models/user_model.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
 import 'package:semester_5_project_mobile_app/services/messages.dart';
 import 'package:semester_5_project_mobile_app/util/request_handler.dart';

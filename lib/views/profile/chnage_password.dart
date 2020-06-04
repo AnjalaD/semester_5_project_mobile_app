@@ -33,9 +33,14 @@ class _ChangePasswordState extends State<ChangePassword> {
             oldPassword: _oldPass.text,
             newPassword: _newPass.text,
           );
-          messages.add(result
-              ? 'Password Changed Successfully!'
-              : 'Old Password is Incorrect!');
+          if (result) {
+            messages.add('Password Changed Successfully!');
+            _oldPass.text = '';
+            _newPass.text = '';
+            _confirm.text = '';
+          } else {
+            messages.add('Old Password is Incorrect!');
+          }
         }
         auth.isLoading = false;
       };
@@ -50,41 +55,44 @@ class _ChangePasswordState extends State<ChangePassword> {
     );
     return PageWrapper(
       title: 'Edit Profile',
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: <Widget>[
-            CustomTextField(
-              labelText: 'Old Password',
-              isPassword: true,
-              textEditingController: _oldPass,
-            ),
-            CustomTextField(
-              labelText: 'New Password',
-              textEditingController: _newPass,
-              isPassword: true,
-              onChanged: (_) {
-                passwordMatch.checkWith = _newPass.text;
-              },
-              validator: Validator.validator(
-                [MinValidator(6), PasswordValidator()],
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              CustomTextField(
+                labelText: 'Old Password',
+                isPassword: true,
+                textEditingController: _oldPass,
               ),
-            ),
-            CustomTextField(
-              labelText: 'Re-Type New Password',
-              textEditingController: _confirm,
-              isPassword: true,
-              validator: Validator.validator(
-                [
-                  passwordMatch,
-                ],
+              CustomTextField(
+                labelText: 'New Password',
+                textEditingController: _newPass,
+                isPassword: true,
+                onChanged: (_) {
+                  passwordMatch.checkWith = _newPass.text;
+                },
+                validator: Validator.validator(
+                  [MinValidator(6), PasswordValidator()],
+                ),
               ),
-            ),
-            CustomButton(
-              labelText: 'Change Password',
-              onPressed: _changePassword(auth, messages),
-            )
-          ],
+              CustomTextField(
+                labelText: 'Re-Type New Password',
+                textEditingController: _confirm,
+                isPassword: true,
+                validator: Validator.validator(
+                  [
+                    passwordMatch,
+                  ],
+                ),
+              ),
+              CustomButton(
+                labelText: 'Change Password',
+                onPressed: _changePassword(auth, messages),
+              )
+            ],
+          ),
         ),
       ),
     );
