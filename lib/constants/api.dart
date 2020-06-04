@@ -2,8 +2,8 @@ class Api {
   static final int kWebPort = 8080;
   static final int kSocketPort = 3003;
 
-  static final String kWebApi = 'http://3.93.145.168:$kWebPort/api';
-  static final String kSocketApi = 'http://3.93.145.168:$kSocketPort/api';
+  static final String kWebApi = 'http://3.95.136.103:$kWebPort/api';
+  static final String kSocketApi = 'http://3.95.136.103:$kSocketPort/api';
 
   /// NO AUTH
   /// /user/signup POST JSON
@@ -12,8 +12,8 @@ class Api {
   /// NO AUTH
   /// /user/signin POST JSON
   /// {
-  /// "nic":"9731451831v",
-  /// "password":"password"
+  ///  "nic":"9731451831v",
+  ///  "password":"password"
   /// }
   static final String kSignInApi = "$kWebApi/user/signin";
   // test
@@ -38,11 +38,11 @@ class Api {
   /// AUTH
   ///  /api/user/update PUT JSON
   /// {
-  /// "addressLine1":"abcd",
-  /// "addressLine2":"cdef",
-  /// "city":"ysjd",
-  /// "email":"lahiru@gmail.om",
-  /// "telephoneNumber":"123456"
+  ///  "addressLine1":"abcd",
+  ///  "addressLine2":"cdef",
+  ///  "city":"ysjd",
+  ///  "email":"lahiru@gmail.om",
+  ///  "telephoneNumber":"123456"
   ///}
   static final String kUpdateUserApi = "$kWebApi/user/update";
 
@@ -53,9 +53,18 @@ class Api {
   /// AUTH
   /// /api/user/change-password POST JSON
   /// {
-  /// "newPassword":"newpassword",
-  /// "oldPassword":"password",
-  /// "nic":"973181831v"
+  ///  "newPassword":"newpassword",
+  ///  "oldPassword":"password",
+  ///  "nic":"973181831v"
   /// }
   static final String kChangePasswordApi = "$kWebApi/user/change-password";
+
+  /// AUTH
+  /// /api/user/change-password POST JSON
+  // {
+  //   "prev_location": [6.933276, 79.857203],
+  //   "curr_location": [7.290320, 80.632706],
+  //   "FCM_token": "dKhyZUCXMmk:APA91bHU98HLxXiuc3LNaTnTsQczlWn6tuOBkyxBEJZ"
+  // }
+  static final String kUpdateLocationApi = "$kWebApi/push/save-location";
 }
