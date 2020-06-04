@@ -1,13 +1,20 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:semester_5_project_mobile_app/models/proxy_user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStorage {
-  final FlutterSecureStorage storage = new FlutterSecureStorage();
+  SharedPreferences storage;
+  AppStorage() {
+    _getInstance();
+  }
+
+  Future<void> _getInstance() async {
+    storage = await SharedPreferences.getInstance();
+  }
 
   Future<ProxyUser> getSignInData() async {
     try {
-      final String id = await storage.read(key: 'id');
-      final String token = await storage.read(key: 'token');
+      final String id = storage.getString('id');
+      final String token = storage.getString('token');
       if (id != null && token != null) {
         print('user from storage : ' + id);
         return ProxyUser(id: id, token: token);
@@ -21,8 +28,8 @@ class AppStorage {
 
   Future<void> storeSignInData(ProxyUser proxyUser) async {
     try {
-      await storage.write(key: 'id', value: proxyUser.id);
-      await storage.write(key: 'token', value: proxyUser.token);
+      await storage.setString('id', proxyUser.id);
+      await storage.setString('token', proxyUser.token);
     } catch (err) {
       print('store signin data error :$err');
     }
@@ -30,7 +37,8 @@ class AppStorage {
 
   Future<void> clearStorage() async {
     try {
-      await storage.deleteAll();
+      await storage.remove('id');
+      await storage.remove('token');
     } catch (err) {
       print('clearStorage error : $err');
     }
