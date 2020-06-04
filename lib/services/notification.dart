@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:latlong/latlong.dart';
@@ -32,8 +33,10 @@ class NotificationService {
       },
     );
     String token = await _fcm.getToken();
+    print('token: $token');
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('fcm_token_push', token);
+    await prefs.setString('fcm_token_push', token);
+    Firestore.instance.collection('users').document(token).setData({});
   }
 
   void _initFlnp() {
@@ -60,12 +63,11 @@ class NotificationService {
     if (distance.as(LengthUnit.Kilometer, data.center, data.center) <=
         data.radius) {
       //show notification
-      await _showNotification(data.title, data.description);
+      await showNotification(data.title, data.description);
     }
   }
 
-  static Future<void> _showNotification(
-      String title, String description) async {
+  static Future<void> showNotification(String title, String description) async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
       'your channel id',
       'your channel name',
@@ -86,7 +88,7 @@ class NotificationService {
   }
 
   static Future<dynamic> onBackground(Map<String, dynamic> message) async {
-    _showNotification('afsaf', 'sfafasfsaf');
+    showNotification('afsaf', 'sfafasfsaf');
     print('onMessage: $message');
     _onNotification(new NotificationData.fromJson(message['data']));
   }
