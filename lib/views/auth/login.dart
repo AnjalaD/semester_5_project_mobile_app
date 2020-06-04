@@ -16,7 +16,6 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final TextEditingController _nic = new TextEditingController();
   final TextEditingController _password = new TextEditingController();
-  bool checked = false;
   String error;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -24,10 +23,8 @@ class _LoginState extends State<Login> {
   _loginHandler(Authentication auth) => () async {
         final FormState form = _formKey.currentState;
         if (form.validate()) {
-          String err = await auth.signIn(
-              nic: _nic.text, password: _password.text, keepSignedIn: checked);
-          // Navigator.of(context).pushReplacement(
-          //     MaterialPageRoute(builder: (context) => AlertsList()));
+          String err =
+              await auth.signIn(nic: _nic.text, password: _password.text);
           if (err != null) {
             setState(() {
               error = err;
@@ -60,17 +57,6 @@ class _LoginState extends State<Login> {
                   formKey: _formKey,
                   nic: _nic,
                   password: _password,
-                ),
-                CheckboxListTile(
-                  dense: true,
-                  title: Text('Keep logged in'),
-                  value: checked,
-                  onChanged: (state) {
-                    setState(() {
-                      checked = state;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
