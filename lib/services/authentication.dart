@@ -44,32 +44,15 @@ class Authentication extends ChangeNotifier {
     _proxyUser = await _storage.getSignInData();
     if (_proxyUser != null) {
       print('user from storage' + _proxyUser.toJson().toString());
-      if (await _getUser()) {
-        // new NotificationService();
-      }
+      await _getUser();
     }
     _isLoading = false;
     notifyListeners();
-
-    // _proxyUser = new ProxyUser(id: '1234', token: '1242');
-    // _user = new User(
-    //     firstName: 'Anjala',
-    //     lastName: 'Dilhara',
-    //     addressLine1: '123/a',
-    //     addressLine2: '',
-    //     city: 'Ranala',
-    //     dob: '2013-12-12',
-    //     email: 'anja@i.com',
-    //     nic: '918123123',
-    //     telephoneNumber: '1212414124');
-    // new NotificationService();
   }
 
   ///signIn to system
   Future<String> signIn(
-      {@required String nic,
-      @required String password,
-      bool keepSignedIn}) async {
+      {@required String nic, @required String password}) async {
     _isLoading = true;
     notifyListeners();
 
@@ -81,10 +64,8 @@ class Authentication extends ChangeNotifier {
       print('responsedata: ' + response.data.toString());
       _proxyUser = ProxyUser.fromJson(response.data);
       // print(_proxyUser.toJson());
-      if (keepSignedIn) {
-        print('storing user data : ' + _proxyUser.toJson().toString());
-        _storage.storeSignInData(_proxyUser);
-      }
+      print('storing user data : ' + _proxyUser.toJson().toString());
+      _storage.storeSignInData(_proxyUser);
       await _getUser();
     }
 
@@ -118,10 +99,11 @@ class Authentication extends ChangeNotifier {
     } catch (err) {
       print('signOut cleanStorage error: ${err.toString()}');
     }
-    BackgroundFetch.stop();
+    await BackgroundFetch.stop();
     _proxyUser = null;
     _user = null;
     _isLoading = false;
+
     notifyListeners();
   }
 
@@ -138,7 +120,8 @@ class Authentication extends ChangeNotifier {
     if (response.error == null) {
       try {
         _user = new User.fromJson(response.data["userdata"]);
-        initBackgroundTask();
+        new NotificationService();
+        await initBackgroundTask();
         return true;
       } catch (err) {
         print("error _getUser: ${err.toString()}");
