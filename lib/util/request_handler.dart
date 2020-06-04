@@ -29,6 +29,9 @@ class ApiRequestHandler {
       print('end...........');
 
       return ProcessedResponse(data: data);
+    } on DioError catch (_) {
+      print('dio error............');
+      return ProcessedResponse(error: 'Network error!');
     } catch (err) {
       print('error............');
 
@@ -47,6 +50,9 @@ class ApiRequestHandler {
       Map<String, dynamic> data = _responseHandler(response);
       print('end...........');
       return ProcessedResponse(data: data);
+    } on DioError catch (_) {
+      print('dio error............');
+      return ProcessedResponse(error: 'Network error!');
     } catch (err) {
       print('error............');
       return ProcessedResponse(error: err.toString());
@@ -69,6 +75,9 @@ class ApiRequestHandler {
       Map<String, dynamic> data = _responseHandler(response);
       print('end...........');
       return ProcessedResponse(data: data);
+    } on DioError catch (_) {
+      print('dio error............');
+      return ProcessedResponse(error: 'Network error!');
     } catch (err) {
       print('error............');
       return ProcessedResponse(error: err.toString());
@@ -129,16 +138,15 @@ class ApiRequestHandler {
     }
   }
 
-  static Future<bool> deleteUser({String token}) async {
+  static Future<bool> deleteUser({String token, String password}) async {
     print('calling delete-user api...');
-
+    print('token: $password');
     try {
       Response response = await _dio.delete(
         Api.kDeleteUserApi,
+        data: {"password": password},
         options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-          },
+          headers: {"Authorization": "Bearer $token"},
         ),
       );
       _responseHandler(response);
@@ -165,6 +173,29 @@ class ApiRequestHandler {
           "oldPassword": oldPassword,
           "newPassword": newPassword,
         },
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+          },
+        ),
+      );
+      _responseHandler(response);
+      print('end...........');
+      return true;
+    } catch (err) {
+      print('error............');
+      return false;
+    }
+  }
+
+  static Future<bool> updateLocation(
+      {Map<String, dynamic> data, String token}) async {
+    print('calling update location api...');
+
+    try {
+      Response response = await _dio.post(
+        Api.kUpdateLocationApi,
+        data: data,
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
