@@ -53,6 +53,11 @@ class _LoginState extends State<Register> {
             });
           } else {
             messages.add('Registration Complete. Please Login');
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => Login(),
+              ),
+            );
           }
         }
       };

@@ -34,7 +34,7 @@ class Alert extends StatelessWidget {
             offset: Offset(1, 2),
           )
         ],
-        color: color ?? Colors.amber,
+        color: color,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -43,8 +43,7 @@ class Alert extends StatelessWidget {
           Container(
             padding: EdgeInsets.only(top: 8, bottom: 8),
             child: Text(
-              description ??
-                  'The following video (recorded at slow speed) shows a typical example. Tapping the flippers in the center of the route flies them to the upper left corner of a new, blue route, at a smaller size. Tapping the flippers in the blue route (or using the device’s back-to-previous-route gesture) flies the flippers back to the original route.',
+              description,
               style: Theme.of(context).textTheme.bodyText2,
               maxLines: maxLines,
               overflow: (maxLines != null ? TextOverflow.ellipsis : null),
@@ -83,22 +82,22 @@ class AlertHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: <Widget>[
           Text(
-            title ?? 'Title',
+            title,
             style: Theme.of(context).textTheme.headline6,
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               Text(
-                date ?? '2020/04/10',
+                date,
                 textAlign: TextAlign.right,
                 style: Theme.of(context).textTheme.caption,
               ),
-              Text(
-                time ?? '07:12PM',
-                textAlign: TextAlign.right,
-                style: Theme.of(context).textTheme.caption,
-              ),
+              // Text(
+              //   time ?? '07:12PM',
+              //   textAlign: TextAlign.right,
+              //   style: Theme.of(context).textTheme.caption,
+              // ),
             ],
           )
         ],

@@ -5,6 +5,8 @@ import 'package:semester_5_project_mobile_app/auth_wrapper.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
 import 'package:semester_5_project_mobile_app/services/background_task.dart';
 import 'package:semester_5_project_mobile_app/services/messages.dart';
+import 'package:semester_5_project_mobile_app/services/notification.dart';
+import 'package:semester_5_project_mobile_app/views/auth/login.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,6 +21,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => Authentication()),
         ChangeNotifierProvider(create: (_) => Messages()),
+        ChangeNotifierProvider(create: (_) => NotificationService()),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
@@ -26,7 +29,12 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: AuthWrapper(),
+        home: Consumer<Authentication>(builder: (context, auth, child) {
+          print('auth: ${auth.proxyUser}');
+          return auth.proxyUser != null && auth.proxyUser.id != null
+              ? AuthWrapper()
+              : Login();
+        }),
       ),
     );
   }

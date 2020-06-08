@@ -1,9 +1,9 @@
 class Api {
   static final int kWebPort = 8080;
   static final int kSocketPort = 3003;
-
-  static final String kWebApi = 'http://3.95.136.103:$kWebPort/api';
-  static final String kSocketApi = 'http://3.95.136.103:$kSocketPort/api';
+  static final String kBaseUrl = 'http://3.83.31.35';
+  static final String kWebApi = '$kBaseUrl:$kWebPort/api';
+  static final String kSocketApi = '$kBaseUrl:$kSocketPort/api';
 
   /// NO AUTH
   /// /user/signup POST JSON

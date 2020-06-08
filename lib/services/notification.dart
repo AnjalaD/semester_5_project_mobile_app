@@ -1,95 +1,163 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong/latlong.dart';
-import 'package:semester_5_project_mobile_app/models/notification_data.dart';
+import 'package:semester_5_project_mobile_app/models/alert_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class NotificationService {
-  FirebaseMessaging _fcm;
-  static FlutterLocalNotificationsPlugin _notificationsPlugin;
+class NotificationService extends ChangeNotifier {
+  static FlutterLocalNotificationsPlugin notificationsPlugin;
 
   NotificationService() {
-    _initFlnp();
-    _initFcm();
+    initFlnp();
   }
+  // static Future<void> initFcm() async {
+  //   print('init firebase messaging');
+  //   final fcm = new FirebaseMessaging();
+  //   fcm.configure(
+  //     // onBackgroundMessage: onBackground,
+  //     onMessage: (Map<String, dynamic> message) async {
+  //       print('---onMessage: $message');
+  //       onNotification(AlertMessage.fromJson(message));
+  //       print('---next');
+  //     },
+  //     onLaunch: (Map<String, dynamic> message) async {
+  //       print("onLaunch: $message");
+  //       await onNotification(AlertMessage.fromJson(message));
+  //     },
+  //     onResume: (Map<String, dynamic> message) async {
+  //       print("onResume: $message");
+  //       await onNotification(AlertMessage.fromJson(message));
+  //     },
+  //   );
+  //   String token = await fcm.getToken();
+  //   print('fcm-token: $token');
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   await prefs.setString('fcm_token_push', token);
+  //   Firestore.instance.collection('users').document(token).setData({});
+  // }
 
-  void _initFcm() async {
-    print('init firebase messaging');
-    _fcm = new FirebaseMessaging();
-    _fcm.configure(
-      onBackgroundMessage: onBackground,
-      onMessage: (Map<String, dynamic> message) async {
-        print('onMessage: $message');
-        _onNotification(new NotificationData.fromJson(message['data']));
+  Future<void> initFCM() async {
+    FirebaseMessaging fcm = new FirebaseMessaging();
+    fcm.configure(
+      onMessage: (Map<String, dynamic> message) {
+        print('--onMessage: $message');
+        Map<String, dynamic> data = Map<String, dynamic>.from(message["data"]);
+        onNotification(AlertMessage.fromJson(data));
+        return;
       },
-      onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
-        _onNotification(new NotificationData.fromJson(message['data']));
+      onLaunch: (Map<String, dynamic> message) {
+        print('--onLaunch: $message');
+        Map<String, dynamic> data = Map<String, dynamic>.from(message["data"]);
+        onNotification(AlertMessage.fromJson(data));
+        return;
       },
-      onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
-        _onNotification(new NotificationData.fromJson(message['data']));
+      onResume: (Map<String, dynamic> message) {
+        print('--onResume: $message');
+        Map<String, dynamic> data = Map<String, dynamic>.from(message["data"]);
+        onNotification(AlertMessage.fromJson(data));
+        return;
       },
+      // onBackgroundMessage: onBackground,
     );
-    String token = await _fcm.getToken();
-    print('token: $token');
+    String token = await fcm.getToken();
+    print('fcm-token: $token');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('fcm_token_push', token);
     Firestore.instance.collection('users').document(token).setData({});
   }
 
-  void _initFlnp() {
-    print('init local notifications');
-    _notificationsPlugin = new FlutterLocalNotificationsPlugin();
-
-    AndroidInitializationSettings initAndroid =
-        new AndroidInitializationSettings('mipmap/ic_launcher');
-    IOSInitializationSettings initIOS = new IOSInitializationSettings();
-
-    InitializationSettings initSettings =
-        new InitializationSettings(initAndroid, initIOS);
-    _notificationsPlugin = new FlutterLocalNotificationsPlugin();
-
-    _notificationsPlugin.initialize(initSettings);
-  }
-
-  static Future<void> _onNotification(NotificationData data) async {
-    print('onNotification');
-    final Distance distance = new Distance();
-    print(
-        'distance: ${distance.as(LengthUnit.Kilometer, data.center, data.center)}');
-
-    if (distance.as(LengthUnit.Kilometer, data.center, data.center) <=
-        data.radius) {
-      //show notification
-      await showNotification(data.title, data.description);
+  Future<void> onNotification(AlertMessage message) async {
+    print('--alert received: $message');
+    bool ok = true;
+    if (message.radius != null) {
+      final distance = new Distance();
+      Position position = await Geolocator()
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      print('--location: $position');
+      double meters = distance.as(
+          LengthUnit.Meter,
+          message.center,
+          LatLng(
+            position.latitude,
+            position.longitude,
+          ));
+      print('--distance: $meters');
+      if (meters > message.radius) {
+        ok = false;
+        print('--outside radius');
+        //show notification
+        // await showNotification(message.title, message.description);
+      } else {
+        print('--inside radius');
+      }
+    }
+    if (ok) {
+      print('--savenotification');
+      await saveAlert(message);
+      print('--shownotification');
+      await showNotification(message.title, message.description);
+      notifyListeners();
     }
   }
 
-  static Future<void> showNotification(String title, String description) async {
-    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      'your channel id',
-      'your channel name',
-      'your channel description',
-      importance: Importance.Max,
-      priority: Priority.High,
-    );
-    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-    var platformChannelSpecifics = new NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await _notificationsPlugin.show(
-      0,
-      title,
-      description,
-      platformChannelSpecifics,
-      payload: 'Default_Sound',
-    );
+  Future<void> saveAlert(AlertMessage message) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> alerts = [];
+    try {
+      alerts = prefs.getStringList('alerts') ?? [];
+    } catch (err) {
+      print('no alerts - $err');
+    }
+    alerts.add(jsonEncode(message.toJson()));
+    prefs.setStringList('alerts', alerts);
   }
 
-  static Future<dynamic> onBackground(Map<String, dynamic> message) async {
-    showNotification('afsaf', 'sfafasfsaf');
-    print('onMessage: $message');
-    _onNotification(new NotificationData.fromJson(message['data']));
+  Future<bool> initFlnp() async {
+    print('init local notifications');
+    notificationsPlugin = new FlutterLocalNotificationsPlugin();
+
+    final initAndroid = new AndroidInitializationSettings('mipmap/ic_launcher');
+    final initIOS = new IOSInitializationSettings();
+
+    final initSettings = new InitializationSettings(initAndroid, initIOS);
+    notificationsPlugin = new FlutterLocalNotificationsPlugin();
+
+    return await notificationsPlugin.initialize(initSettings);
+  }
+
+  // Future<void> onBackground(Map<String, dynamic> message) {
+  //   print('--onResume: $message');
+  //   Map<String, dynamic> data = Map<String, dynamic>.from(message["data"]);
+  //   onNotification(AlertMessage.fromJson(data));
+  // }
+
+  static Future<void> showNotification(String title, String description) async {
+    if (notificationsPlugin != null) {
+      var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+        'commhawk_notification_channel_id',
+        'Commhawk',
+        'Disaster management system',
+        importance: Importance.Max,
+        priority: Priority.High,
+      );
+      var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+      var platformChannelSpecifics = new NotificationDetails(
+          androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+      await notificationsPlugin.show(
+        0,
+        title,
+        description,
+        platformChannelSpecifics,
+        payload: 'Default_Sound',
+      );
+    } else {
+      print('--notification-plugin: falied');
+    }
   }
 }
