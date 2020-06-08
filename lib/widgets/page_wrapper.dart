@@ -56,9 +56,10 @@ class PageWrapper extends StatelessWidget {
                 Text(
                   'Loading...',
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      decoration: TextDecoration.none),
+                    color: Colors.white,
+                    fontSize: 10,
+                    decoration: TextDecoration.none,
+                  ),
                 )
               ],
             ),

@@ -2,16 +2,12 @@ import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/foundation.dart';
 import 'package:semester_5_project_mobile_app/models/proxy_user_model.dart';
 import 'package:semester_5_project_mobile_app/models/update_user_model.dart';
-import 'package:semester_5_project_mobile_app/services/background_task.dart';
 import 'package:semester_5_project_mobile_app/util/classes/response.dart';
 import 'package:semester_5_project_mobile_app/models/user_model.dart';
-import 'package:semester_5_project_mobile_app/services/notification.dart';
 import 'package:semester_5_project_mobile_app/util/app_storage.dart';
 import 'package:semester_5_project_mobile_app/util/request_handler.dart';
 
 class Authentication extends ChangeNotifier {
-  final AppStorage _storage = AppStorage();
-
   bool _isLoading = false;
   ProxyUser _proxyUser;
   User _user;
@@ -25,15 +21,6 @@ class Authentication extends ChangeNotifier {
   ProxyUser get proxyUser => _proxyUser;
   User get user => _user;
 
-  void updateUser(UpdateUser updateUser) {
-    _user.addressLine1 = updateUser.addressLine1;
-    _user.addressLine2 = updateUser.addressLine2;
-    _user.city = updateUser.city;
-    _user.email = updateUser.email;
-    _user.telephoneNumber = updateUser.telephoneNumber;
-    notifyListeners();
-  }
-
   Authentication() {
     _signInFromLocalData();
   }
@@ -41,7 +28,7 @@ class Authentication extends ChangeNotifier {
   Future<void> _signInFromLocalData() async {
     _isLoading = true;
     notifyListeners();
-    _proxyUser = await _storage.getSignInData();
+    _proxyUser = await AppStorage.getSignInData();
     if (_proxyUser != null) {
       print('user from storage' + _proxyUser.toJson().toString());
       await _getUser();
@@ -63,10 +50,9 @@ class Authentication extends ChangeNotifier {
     if (response.error == null) {
       print('responsedata: ' + response.data.toString());
       _proxyUser = ProxyUser.fromJson(response.data);
-      // print(_proxyUser.toJson());
+      print('getUser: ${await _getUser()}');
       print('storing user data : ' + _proxyUser.toJson().toString());
-      _storage.storeSignInData(_proxyUser);
-      await _getUser();
+      AppStorage.storeSignInData(_proxyUser);
     }
 
     _isLoading = false;
@@ -95,7 +81,7 @@ class Authentication extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _storage.clearStorage();
+      await AppStorage.clearStorage();
     } catch (err) {
       print('signOut cleanStorage error: ${err.toString()}');
     }
@@ -120,15 +106,22 @@ class Authentication extends ChangeNotifier {
     if (response.error == null) {
       try {
         _user = new User.fromJson(response.data["userdata"]);
-        new NotificationService();
-        await initBackgroundTask();
         return true;
       } catch (err) {
         print("error _getUser: ${err.toString()}");
       }
     }
-    _storage.clearStorage();
+    AppStorage.clearStorage();
     _proxyUser = null;
     return false;
+  }
+
+  void updateUser(UpdateUser updateUser) {
+    _user.addressLine1 = updateUser.addressLine1;
+    _user.addressLine2 = updateUser.addressLine2;
+    _user.city = updateUser.city;
+    _user.email = updateUser.email;
+    _user.telephoneNumber = updateUser.telephoneNumber;
+    notifyListeners();
   }
 }
