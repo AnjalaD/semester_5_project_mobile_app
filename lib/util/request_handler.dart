@@ -138,13 +138,13 @@ class ApiRequestHandler {
     }
   }
 
-  static Future<bool> deleteUser({String token, String password}) async {
+  static Future<bool> deleteUser(
+      {String token, String nic, String password}) async {
     print('calling delete-user api...');
-    print('token: $password');
     try {
       Response response = await _dio.delete(
         Api.kDeleteUserApi,
-        data: {"password": password},
+        data: {"password": password, "nic": nic},
         options: Options(
           headers: {"Authorization": "Bearer $token"},
         ),

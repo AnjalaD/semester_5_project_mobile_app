@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
 import 'package:semester_5_project_mobile_app/services/messages.dart';
 import 'package:semester_5_project_mobile_app/util/request_handler.dart';
+import 'package:semester_5_project_mobile_app/views/auth/login.dart';
 import 'package:semester_5_project_mobile_app/views/profile/chnage_password.dart';
 import 'package:semester_5_project_mobile_app/views/profile/edit.dart';
 import 'package:semester_5_project_mobile_app/views/profile/widgets/profile_row.dart';
@@ -37,11 +38,15 @@ class Profile extends StatelessWidget {
                   onPressed: () async {
                     bool res = await ApiRequestHandler.deleteUser(
                       token: auth.proxyUser.token,
+                      nic: auth.user.nic,
                       password: password.text,
                     );
                     if (res) {
                       auth.signOut();
                       messages.add('Account Deleted!');
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => Login(),
+                      ));
                       return;
                     }
                     messages.add('Error Occured, Please try again!');

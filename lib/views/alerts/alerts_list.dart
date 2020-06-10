@@ -38,27 +38,31 @@ class AlertsList extends StatelessWidget {
             initialData: [],
             builder: (context, snapshot) {
               List<AlertMessage> messages = snapshot.data;
-              return ListView.builder(
-                itemCount: messages.length,
-                itemBuilder: (context, index) => InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => ViewAlert(
-                        title: messages[index].title,
-                        description: messages[index].description,
-                        color: messages[index].color,
-                        date: messages[0].receivedOn,
+              return messages.length > 0
+                  ? ListView.builder(
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) => InkWell(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ViewAlert(
+                              title: messages[index].title,
+                              description: messages[index].description,
+                              color: messages[index].color,
+                              date: messages[0].receivedOn,
+                            ),
+                          ));
+                        },
+                        child: Alert(
+                          title: messages[index].title,
+                          description: messages[index].description,
+                          color: messages[index].color,
+                          date: messages[0].receivedOn,
+                        ),
                       ),
-                    ));
-                  },
-                  child: Alert(
-                    title: messages[index].title,
-                    description: messages[index].description,
-                    color: messages[index].color,
-                    date: messages[0].receivedOn,
-                  ),
-                ),
-              );
+                    )
+                  : Center(
+                      child: Text('No Alerts...'),
+                    );
             }),
       ),
     );

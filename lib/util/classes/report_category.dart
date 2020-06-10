@@ -16,6 +16,7 @@ class ReportCategory {
       _selected = {};
       _selected.add(type);
     } else {
+      _selected.remove(5);
       _selected.add(type);
     }
   }

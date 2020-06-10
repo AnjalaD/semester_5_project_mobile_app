@@ -23,19 +23,19 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => Messages()),
         ChangeNotifierProvider(create: (_) => NotificationService()),
       ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: Consumer<Authentication>(builder: (context, auth, child) {
-          print('auth: ${auth.proxyUser}');
-          return auth.proxyUser != null && auth.proxyUser.id != null
+      child: Consumer<Authentication>(builder: (context, auth, _) {
+        print('auth: ${auth.proxyUser}');
+        return MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          home: auth.proxyUser != null && auth.proxyUser.id != null
               ? AuthWrapper()
-              : Login();
-        }),
-      ),
+              : Login(),
+        );
+      }),
     );
   }
 }
