@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:latlong/latlong.dart';
 import 'package:semester_5_project_mobile_app/util/classes/report_category.dart';
 
@@ -19,7 +20,8 @@ class IncidentReport {
     this.image,
   });
 
-  Map<String, dynamic> toJson() {
+  Future<Map<String, dynamic>> toJson() async {
+    print(image.path);
     Map<String, dynamic> map = {
       'title': title,
       'description': description,
@@ -28,7 +30,10 @@ class IncidentReport {
     };
     if (image != null) {
       map.addAll({
-        'image': MultipartFile.fromFile(image.path),
+        'image': await MultipartFile.fromFile(
+          image.path,
+          contentType: MediaType('image', 'jpeg'),
+        )
       });
     }
     return map;

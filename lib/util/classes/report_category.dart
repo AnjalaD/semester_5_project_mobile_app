@@ -25,6 +25,10 @@ class ReportCategory {
     _selected.remove(type);
   }
 
+  void clear() {
+    _selected.clear();
+  }
+
   @override
   String toString() {
     return "[${_selected.toList().join(',')}]";

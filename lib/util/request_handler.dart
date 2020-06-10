@@ -88,15 +88,15 @@ class ApiRequestHandler {
     IncidentReport incidentReport,
     String token,
   }) async {
-    print('report :${incidentReport.toJson()}');
+    print('report :${await incidentReport.toJson()}');
     try {
       print('calling sendreport api...');
 
       Response response = await _dio.post(
         Api.kSendReportApi,
-        data: FormData.fromMap(incidentReport.toJson()),
-        // onSendProgress: (count, total) =>
-        //     print('send :${(count / total) * 100}'),
+        data: FormData.fromMap(await incidentReport.toJson()),
+        onSendProgress: (count, total) =>
+            print('send :${(count / total) * 100}'),
         // onReceiveProgress: (count, total) =>
         //     print('receive :${(count / total) * 100}'),
         options: Options(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/models/incident_report.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
+import 'package:semester_5_project_mobile_app/services/messages.dart';
 import 'package:semester_5_project_mobile_app/util/classes/report_category.dart';
 import 'package:semester_5_project_mobile_app/util/request_handler.dart';
 import 'package:semester_5_project_mobile_app/views/Report/widgets/add_image.dart';
@@ -36,10 +37,12 @@ class _ReportFormState extends State<ReportForm> {
   }
 
   void _addImageOnChanged(File newImage) {
-    _image = newImage;
+    setState(() {
+      _image = newImage;
+    });
   }
 
-  Function _sendReport(Authentication auth) => () async {
+  Function _sendReport(Authentication auth, Messages messages) => () async {
         print('sendReport');
         IncidentReport report = new IncidentReport(
           categories: _category,
@@ -52,6 +55,16 @@ class _ReportFormState extends State<ReportForm> {
         auth.isLoading = true;
         bool res = await ApiRequestHandler.sendReport(
             incidentReport: report, token: auth.proxyUser.token);
+        if (res) {
+          messages.add('Report Sent!');
+          setState(() {
+            _description.text = '';
+            _title.text = '';
+            _category.clear();
+            _image = null;
+            _markerPosition = null;
+          });
+        }
         auth.isLoading = false;
         print('sendReport res: $res');
       };
@@ -59,6 +72,7 @@ class _ReportFormState extends State<ReportForm> {
   @override
   Widget build(BuildContext context) {
     Authentication auth = Provider.of<Authentication>(context);
+    Messages messages = Provider.of<Messages>(context);
 
     return Stepper(
       onStepTapped: (int step) {
@@ -120,6 +134,7 @@ class _ReportFormState extends State<ReportForm> {
           subtitle: Text('Image of the incident (optional)'),
           content: AddImage(
             onChange: _addImageOnChanged,
+            image: _image,
           ),
         ),
         Step(
@@ -141,7 +156,8 @@ class _ReportFormState extends State<ReportForm> {
           RaisedButton(
             color: Theme.of(context).primaryColor,
             child: Text(_step == 3 ? 'Submit' : 'Next'),
-            onPressed: _step == 3 ? _sendReport(auth) : onStepContinue,
+            onPressed:
+                _step == 3 ? _sendReport(auth, messages) : onStepContinue,
           )
         ],
       ),

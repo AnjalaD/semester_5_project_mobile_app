@@ -3,24 +3,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class AddImage extends StatefulWidget {
-  const AddImage({Key key, this.onChange}) : super(key: key);
-
-  @override
-  _AddImageState createState() => _AddImageState();
+class AddImage extends StatelessWidget {
+  const AddImage({Key key, this.onChange, this.image}) : super(key: key);
 
   final Function onChange;
-}
-
-class _AddImageState extends State<AddImage> {
-  File _image;
+  final File image;
 
   Function getImage(ImageSource imageSource) => () async {
-        var image = await ImagePicker.pickImage(source: imageSource);
-        setState(() {
-          _image = image;
-        });
-        this.widget.onChange(image);
+        // var image = await ImagePicker.pickImage(source: imageSource);
+        // setState(() {
+        //   _image = image;
+        // });
+        onChange(await ImagePicker.pickImage(source: imageSource));
       };
 
   @override
@@ -28,7 +22,7 @@ class _AddImageState extends State<AddImage> {
     return Container(
       height: 300,
       child: Center(
-        child: _image == null
+        child: image == null
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -44,7 +38,25 @@ class _AddImageState extends State<AddImage> {
                   )
                 ],
               )
-            : Image.file(_image),
+            : Stack(
+                children: <Widget>[
+                  Positioned.fill(
+                    child: Image.file(image),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: ButtonTheme(
+                      buttonColor: Colors.white,
+                      child: IconButton(
+                        color: Colors.black,
+                        icon: Icon(Icons.close),
+                        onPressed: () => onChange(null),
+                      ),
+                    ),
+                  )
+                ],
+              ),
       ),
     );
   }
