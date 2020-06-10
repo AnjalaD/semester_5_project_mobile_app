@@ -69,7 +69,6 @@ class Authentication extends ChangeNotifier {
     if (response.error == null) {
       _proxyUser = ProxyUser.fromJson(response.data);
       print('proxyUser :_${proxyUser.toJson()}');
-      await _getUser();
     }
 
     _isLoading = false;
