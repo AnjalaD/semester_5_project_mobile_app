@@ -43,30 +43,40 @@ class _ReportFormState extends State<ReportForm> {
   }
 
   Function _sendReport(Authentication auth, Messages messages) => () async {
-        print('sendReport');
-        IncidentReport report = new IncidentReport(
-          categories: _category,
-          title: _title.text,
-          description: _description.text,
-          location: _markerPosition,
-          image: _image,
-        );
+        if (!_category.isEmpty &&
+            _title.text.isNotEmpty &&
+            _description.text.isNotEmpty) {
+          if (_markerPosition != null) {
+            print('sendReport');
+            IncidentReport report = new IncidentReport(
+              categories: _category,
+              title: _title.text,
+              description: _description.text,
+              location: _markerPosition,
+              image: _image,
+            );
 
-        auth.isLoading = true;
-        bool res = await ApiRequestHandler.sendReport(
-            incidentReport: report, token: auth.proxyUser.token);
-        if (res) {
-          messages.add('Report Sent!');
-          setState(() {
-            _description.text = '';
-            _title.text = '';
-            _category.clear();
-            _image = null;
-            _markerPosition = null;
-          });
+            auth.isLoading = true;
+            bool res = await ApiRequestHandler.sendReport(
+                incidentReport: report, token: auth.proxyUser.token);
+            if (res) {
+              messages.add('Report Sent!');
+              setState(() {
+                _description.text = '';
+                _title.text = '';
+                _category.clear();
+                _image = null;
+                _markerPosition = null;
+              });
+            }
+            auth.isLoading = false;
+            print('sendReport res: $res');
+          } else {
+            messages.add('Please selected the location.');
+          }
+        } else {
+          messages.add('Please fill the details form.');
         }
-        auth.isLoading = false;
-        print('sendReport res: $res');
       };
 
   @override

@@ -11,6 +11,8 @@ class ReportCategory {
 
   List<int> get selected => _selected.toList();
 
+  bool get isEmpty => _selected.isEmpty;
+
   void add(int type) {
     if (type == 5) {
       _selected = {};
