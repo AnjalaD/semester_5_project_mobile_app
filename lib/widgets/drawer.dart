@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:semester_5_project_mobile_app/services/authentication.dart';
 import 'package:semester_5_project_mobile_app/views/Report/report.dart';
 import 'package:semester_5_project_mobile_app/views/alerts/alerts_list.dart';
+import 'package:semester_5_project_mobile_app/views/auth/login.dart';
 import 'package:semester_5_project_mobile_app/views/profile/profile.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -80,6 +81,9 @@ class CustomDrawer extends StatelessWidget {
               leading: Icon(Icons.exit_to_app),
               onTap: () {
                 auth.signOut();
+                 Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => Login(),
+              ));
               },
             ),
           )
