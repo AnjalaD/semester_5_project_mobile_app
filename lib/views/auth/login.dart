@@ -37,29 +37,39 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     Authentication auth = Provider.of<Authentication>(context);
     return PageWrapper(
-      title: 'Login',
-      appBarActions: <Widget>[
-        FlatButton.icon(
-          icon: Icon(Icons.person_add),
-          label: Text('Register'),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => Register()));
-          },
-        )
-      ],
-      body: Center(
-        child: ListView(
-          children: <Widget>[
-            Column(
+      appBar: AppBar(
+        backgroundColor: Colors.white10,
+        elevation: 0,
+        actions: <Widget>[
+          FlatButton.icon(
+            icon: Icon(Icons.person_add),
+            label: Text('Register'),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => Register()));
+            },
+          )
+        ],
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            child: Column(
               children: <Widget>[
+                Text(
+                  'Welcome to Commhawk!',
+                  style: Theme.of(context).textTheme.headline5,
+                ),
+                SizedBox(height: 24),
                 LoginForm(
                   formKey: _formKey,
                   nic: _nic,
                   password: _password,
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
                     error != null ? "*$error" : '',
                     style: TextStyle(color: Colors.red),
@@ -69,22 +79,10 @@ class _LoginState extends State<Login> {
                   labelText: 'Login',
                   onPressed: _loginHandler(auth),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 40, 8, 8),
-                  child: ButtonTheme(
-                    height: 40,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    child: FlatButton(
-                      child: Text('Forgot Password?'),
-                      onPressed: () {},
-                    ),
-                  ),
-                )
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

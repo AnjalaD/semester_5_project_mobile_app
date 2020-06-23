@@ -25,9 +25,6 @@ class LoginForm extends StatelessWidget {
       key: _formKey,
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(40),
-          ),
           CustomTextField(
             labelText: 'NIC',
             textEditingController: _nic,
