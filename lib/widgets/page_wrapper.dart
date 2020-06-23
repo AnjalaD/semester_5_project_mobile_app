@@ -12,9 +12,11 @@ class PageWrapper extends StatelessWidget {
       this.drawer,
       this.body,
       this.isLoading,
+      this.appBar,
       this.appBarActions})
       : super(key: key);
 
+  final AppBar appBar;
   final String title;
   final Widget drawer;
   final Widget body;
@@ -65,10 +67,12 @@ class PageWrapper extends StatelessWidget {
             ),
           ),
           child: Scaffold(
-            appBar: AppBar(
-              title: Text(title),
-              actions: appBarActions ?? [],
-            ),
+            appBar: appBar != null
+                ? appBar
+                : AppBar(
+                    title: Text(title),
+                    actions: appBarActions ?? [],
+                  ),
             drawer: drawer,
             body: Builder(
               builder: (context) {
