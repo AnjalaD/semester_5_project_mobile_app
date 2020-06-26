@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<Authentication>(builder: (context, auth, _) {
         print('auth: ${auth.proxyUser}');
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           theme: ThemeData(
             primarySwatch: Colors.blue,
