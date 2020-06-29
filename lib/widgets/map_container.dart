@@ -78,7 +78,7 @@ class MapContainerState extends State<MapContainer>
       _animatedMapMove(point, 10);
       this.widget.onTap(point);
     } catch (err) {
-      print(err);
+      print('get location error :$err');
     }
   }
 
@@ -147,7 +147,7 @@ class MyLocationButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(25),
           boxShadow: [
             BoxShadow(
-              blurRadius: 4,
+              blurRadius: 1,
               color: Colors.grey,
             ),
           ]),

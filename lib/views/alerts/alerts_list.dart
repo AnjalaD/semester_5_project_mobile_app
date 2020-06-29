@@ -57,6 +57,7 @@ class AlertsList extends StatelessWidget {
                           description: messages[index].description,
                           color: messages[index].color,
                           date: messages[0].receivedOn,
+                          maxLines: 4,
                         ),
                       ),
                     )
