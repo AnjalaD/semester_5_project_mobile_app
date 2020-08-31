@@ -10,7 +10,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name=".Application"
-        android:label="semester_5_project_mobile_app"
+        android:label="Commhawk"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
