@@ -23,7 +23,7 @@ class Alert extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 10, left: 8, right: 8),
+      margin: EdgeInsets.only(top: 16, left: 8, right: 8),
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         boxShadow: [
@@ -41,7 +41,7 @@ class Alert extends StatelessWidget {
         children: <Widget>[
           AlertHeader(title: title, date: date, time: time),
           Container(
-            padding: EdgeInsets.only(top: 8, bottom: 8),
+            padding: EdgeInsets.only(top: 8, bottom: 16),
             child: Text(
               description,
               style: Theme.of(context).textTheme.bodyText2,

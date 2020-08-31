@@ -1,7 +1,7 @@
 class Api {
   static final int kWebPort = 8080;
   static final int kSocketPort = 3003;
-  static final String kBaseUrl = 'http://localhost';
+  static final String kBaseUrl = 'http://159.65.151.146';
   static final String kWebApi = '$kBaseUrl:$kWebPort/api';
   static final String kSocketApi = '$kBaseUrl:$kSocketPort/api';
 

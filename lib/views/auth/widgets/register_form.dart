@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:semester_5_project_mobile_app/util/validators/date_validator.dart';
 import 'package:semester_5_project_mobile_app/util/validators/email_validator.dart';
 import 'package:semester_5_project_mobile_app/util/validators/empty_validator.dart';
 import 'package:semester_5_project_mobile_app/util/validators/form_validator.dart';
@@ -98,6 +99,8 @@ class RegisterForm extends StatelessWidget {
                   child: CustomTextField(
                     labelText: 'Date of birth',
                     textEditingController: _dob,
+                    hintText: 'YYYY-MM-DD',
+                    validator: Validator.validator([EmptyValidator(), DateValidator()]),
                   ),
                 ),
               ],

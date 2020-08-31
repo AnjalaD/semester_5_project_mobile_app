@@ -25,16 +25,23 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<Authentication>(builder: (context, auth, _) {
         print('auth: ${auth.proxyUser}');
-        return MaterialApp(
+        return auth.proxyUser != null && auth.proxyUser.id != null
+              ? MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
+          title: 'Commhawk',
           theme: ThemeData(
             primarySwatch: Colors.blue,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
+            //visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          home: auth.proxyUser != null && auth.proxyUser.id != null
-              ? AuthWrapper()
-              : Login(),
+          home:  AuthWrapper(),
+        ) :MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Commhawk',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            //visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          home:  Login(),
         );
       }),
     );

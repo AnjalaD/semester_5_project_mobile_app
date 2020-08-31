@@ -21,7 +21,7 @@ class IncidentReport {
   });
 
   Future<Map<String, dynamic>> toJson() async {
-    print(image.path);
+
     Map<String, dynamic> map = {
       'title': title,
       'description': description,
